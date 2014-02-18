@@ -20,20 +20,26 @@ class BinaryExp extends Exp {
     BinaryExp(String o, Exp l, Exp r) {op = o; left = l; right = r;}
     public String toString() {return "(" + op + " " + left + " " + right + ")";}
 }
+class IdExp extends Exp {
+    IdExp(){}
+    public String toString() {return "ID";}
+}
 
 PARSER_END(Parser)
 
 SKIP:  { " " | "\t" | "\n" | "\r"                    }
-TOKEN: { "(" | ")" | "+" | "*" | <NUM: (["0"-"9"])+> }
+TOKEN: { "(" | ")" | "+" | "*" | <NUM: (["0"-"9"])+> | <ID: ["a"-"z", "A"-"Z", "_"](["a"-"z", "A"-"Z", "0"-"9", "_"])*> }
 
 Exp S(): {Exp e;}
 {
   e=E() <EOF> {return e;}
 }
 
-Exp E(): {Exp e1; Exp e2;}
+Exp E(): {Exp e1; Exp e2; Token i;}
 {
   e1=T() ("+" e2=T() {e1 = new BinaryExp("+", e1, e2);} )* {return e1;}
+|
+  i=<ID> {return new IdExp();}
 }
 
 Exp T(): {Exp e1; Exp e2;}
