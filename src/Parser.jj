@@ -1,28 +1,15 @@
 PARSER_BEGIN(Parser)
 
+import mjc.Exp;
+import mjc.Num;
+import mjc.BinaryExp;
+import mjc.IdExp;
+
 public class Parser {
     public static void main(String[] args) throws Exception {
         Exp result = new Parser(new java.io.StringReader(args[0])).S();
         System.out.println(result);
     }
-}
-
-// Classes defining the Abstract Syntax Tree
-abstract class Exp {}
-class Num extends Exp {
-    int value;
-    Num(int v) {value = v;}
-    public String toString() {return value + "";}
-}
-class BinaryExp extends Exp {
-    String op;
-    Exp left, right;
-    BinaryExp(String o, Exp l, Exp r) {op = o; left = l; right = r;}
-    public String toString() {return "(" + op + " " + left + " " + right + ")";}
-}
-class IdExp extends Exp {
-    IdExp(){}
-    public String toString() {return "ID";}
 }
 
 PARSER_END(Parser)
