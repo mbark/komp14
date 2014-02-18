@@ -1,5 +1,4 @@
 *.aux
-bin/
 *.class
 *.ear
 *.jar
@@ -7,3 +6,5 @@ bin/
 *.out
 *.pdf
 *.war
+bin/
+src/*.java
