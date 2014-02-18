@@ -1,4 +1,5 @@
 *.aux
+bin/
 *.class
 *.ear
 *.jar

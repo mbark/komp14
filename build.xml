@@ -23,6 +23,7 @@
     </target>
     <target depends="clean" name="cleanall"/>
     <target depends="init" name="build">
+        <javacc target="src/Parser.jj" outputdirectory="bin" javacchome="lib/" />
         <javac debug="true" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
             <src path="src"/>
             <classpath refid="komp14.classpath"/>
