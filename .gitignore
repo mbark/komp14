@@ -1,6 +1,8 @@
+*.aux
 *.class
-
-# Package Files #
-*.jar
-*.war
 *.ear
+*.jar
+*.log
+*.out
+*.pdf
+*.war
