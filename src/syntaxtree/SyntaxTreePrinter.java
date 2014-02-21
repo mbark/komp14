@@ -115,13 +115,6 @@ public class SyntaxTreePrinter extends visitor.DepthFirstVisitor
 	postWork(n);
     }
     
-    public void visit(Write n)
-    {
-	preWork(n);
-	super.visit(n);
-	postWork(n);
-    }
-    
     public void visit(Assign n)
     {
 	preWork(n);

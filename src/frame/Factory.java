@@ -1,6 +1,5 @@
 package frame;
 import temp.Label;
-import java.util.List;
 
 /**
  * Implement a factory to return Frame and Record objects

@@ -1,7 +1,6 @@
 package sparc;
 
 import temp.Temp;
-import temp.TempMap;
 
 public class Hardware
 {
