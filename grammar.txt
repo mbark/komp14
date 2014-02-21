@@ -14,7 +14,6 @@ additive -> additive - multiplicative
 multiplicative -> expTerminator
 multiplicative -> multiplicative * expTerminator
 
-expTerminator -> num
 expTerminator -> int_lit
 expTerminator -> true
 expTerminator -> false
