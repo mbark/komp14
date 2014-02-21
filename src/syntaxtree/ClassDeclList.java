@@ -3,21 +3,21 @@ package syntaxtree;
 import java.util.Vector;
 
 public class ClassDeclList {
-   private Vector list;
+    private Vector<ClassDecl> list;
 
-   public ClassDeclList() {
-      list = new Vector();
-   }
+    public ClassDeclList() {
+        list = new Vector<ClassDecl>();
+    }
 
-   public void addElement(ClassDecl n) {
-      list.addElement(n);
-   }
+    public void addElement(ClassDecl n) {
+        list.addElement(n);
+    }
 
-   public ClassDecl elementAt(int i)  { 
-      return (ClassDecl)list.elementAt(i); 
-   }
+    public ClassDecl elementAt(int i) {
+        return list.elementAt(i);
+    }
 
-   public int size() { 
-      return list.size(); 
-   }
+    public int size() {
+        return list.size();
+    }
 }

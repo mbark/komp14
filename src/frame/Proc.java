@@ -1,11 +1,14 @@
 package frame;
 
-public class Proc 
-{
+import java.util.List;
+
+public class Proc {
     public String begin, end;
-    public java.util.List<assem.Instr> body;
-    public Proc(String bg, java.util.List<assem.Instr> bd, String ed)
-    {
-	begin = bg; end = ed; body = bd;	
+    public List<assem.Instr> body;
+
+    public Proc(String bg, List<assem.Instr> bd, String ed) {
+        begin = bg;
+        end = ed;
+        body = bd;
     }
 }
