@@ -51,11 +51,18 @@ void Exp(): {}
     Relational() ExpPrim()
 }
 
+
 void ExpPrim(): {}
 {
     "&&" Exp()
 |
-    {}
+    (
+        "." (
+            <ID> "(" ExpList() ")" |
+            <LENGTH>
+        ) |
+        "[" Exp() "]"
+    )*
 }
 
 void ExpList(): {}
