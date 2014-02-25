@@ -1,0 +1,37 @@
+#!/bin/sh
+
+compdir="$1"
+
+if [ ! -d "$compdir" ]
+  then
+    echo "error: compiler directory \"$compdir\" not found."
+    echo usage: $0 [COMPILER-SOURCE-DIR]
+    exit 1
+  fi
+
+cd $compdir
+
+if [ -f build.xml ] && [ -f DESC ] && [ -d src ] && [ -d lib ] && [ -f report.pdf ]
+  then true
+  else
+    echo "error: missing files in \"$compdir\"."
+    exit
+  fi
+
+if [ ! -s report.pdf ]
+  then
+    echo "NOTE: Empty report.pdf--need to resubmit before oral presentation"
+  fi
+
+if uuencode x </dev/null >/dev/null
+  then true
+  else
+    echo "error: The program \"uuencode\" is missing."
+    echo "       Please install GNU package sharutils."
+    exit 1
+  fi
+
+cd ..
+
+tar cf - `basename $compdir` | gzip | uuencode x | mailx -s '' submit@tigris.csc.kth.se
+exit 0
