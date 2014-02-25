@@ -38,18 +38,31 @@ TOKEN: {
     <RETURN: "return"> |
     <STATIC: "static"> |
     <STRING: "String"> |
+    <SYSOUT: "System.out.println"> |
     <THIS: "this"> |
     <VOID: "void"> |
     <WHILE: "while">
 }
 
-/* Operators etc. */
+/* Operators. */
 TOKEN: {
-    "." | "," | ";" |
-    "+" | "-" | "*" |
-    "<" |
-    "!" | "&&" |
-    "(" | ")" | "[" | "]" | "{" | "}"
+    <ASSIGN: "="> |
+    <LAND: "&&"> |
+    <LNEG: "!"> |
+    <LT: "<"> |
+    <MINUS: "-"> |
+    <PLUS: "+"> |
+    <TIMES: "*">
+}
+
+/* Misc. */
+TOKEN: {
+    <COMMA: ","> |
+    <DOT: "."> |
+    <LBRACE: "{"> | <RBRACE: "}"> |
+    <LBRACKET: "["> | <RBRACKET: "]"> |
+    <LPAREN: "("> | <RPAREN: ")"> |
+    <SEMICOLON: ";">
 }
 
 /* Literals and identifiers. */
@@ -68,42 +81,37 @@ void S(): {}
 void MainClass(): {}
 {
     <CLASS> <ID>
-    "{"
-        <PUBLIC> <STATIC> <VOID> <ID> "(" <STRING> "[" "]" <ID> ")"
-        "{"
-            (
-                LOOKAHEAD(2)
-                VarDecl()
-            )*
+    <LBRACE>
+        <PUBLIC> <STATIC> <VOID> <ID> <LPAREN> <STRING> <LBRACKET> <RBRACKET> <ID> <RPAREN>
+        <LBRACE>
+            ( LOOKAHEAD(2) VarDecl() )*
             ( Stmt() )*
-        "}"
-    "}"
+        <RBRACE>
+    <RBRACE>
 }
 
 void ClassDecl(): {}
 {
     <CLASS> <ID>
-    "{"
-        ( VarDecl() )* ( MethodDecl() )*
-    "}"
+    <LBRACE>
+        ( VarDecl() )*
+        ( MethodDecl() )*
+    <RBRACE>
 }
 
 void VarDecl(): {}
 {
-    Type() <ID> ";"
+    Type() <ID> <SEMICOLON>
 }
 
 void MethodDecl(): {}
 {
-    <PUBLIC> Type() <ID> "(" FormalList() ")"
-    "{"
-        (
-            LOOKAHEAD(2)
-            VarDecl()
-        )*
+    <PUBLIC> Type() <ID> <LPAREN> FormalList() <RPAREN>
+    <LBRACE>
+        ( LOOKAHEAD(2) VarDecl() )*
         ( Stmt() )*
-        <RETURN> Exp() ";"
-    "}"
+        <RETURN> Exp() <SEMICOLON>
+    <RBRACE>
 }
 
 void FormalList(): {}
@@ -115,12 +123,12 @@ void FormalList(): {}
 
 void FormalRest(): {}
 {
-    "," Type() <ID>
+    <COMMA> Type() <ID>
 }
 
 void Type(): {}
 {
-    <INT> ( "[" "]" )?
+    <INT> ( <LBRACKET> <RBRACKET> )?
 |
     <BOOLEAN>
 |
@@ -129,19 +137,19 @@ void Type(): {}
 
 void Stmt(): {}
 {
-    "{" ( Stmt() )* "}"
+    <LBRACE> ( Stmt() )* <RBRACE>
 |
-    <IF> "(" Exp() ")" Stmt() <ELSE> Stmt()
+    <IF> <LPAREN> Exp() <RPAREN> Stmt() <ELSE> Stmt()
 |
-    <WHILE> "(" Exp() ")" Stmt()
+    <WHILE> <LPAREN> Exp() <RPAREN> Stmt()
 |
-    "System.out.println" "(" Exp() ")" ";"
+    <SYSOUT> <LPAREN> Exp() <RPAREN> <SEMICOLON>
 |
     <ID> (
-        "=" Exp() |
-        "[" Exp() "]" "=" Exp()
+        <ASSIGN> Exp() |
+        <LBRACKET> Exp() <RBRACKET> <ASSIGN> Exp()
     )
-    ";"
+    <SEMICOLON>
 }
 
 void Exp(): {}
@@ -152,14 +160,14 @@ void Exp(): {}
 // FIXME: Doesn't work properly
 void ExpPrim(): {}
 {
-    "&&" Exp()
+    <LAND> Exp()
 |
     (
-        "." (
-            <ID> "(" ExpList() ")" |
+        <DOT> (
+            <ID> <LPAREN> ExpList() <RPAREN> |
             <LENGTH>
         ) |
-        "[" Exp() "]"
+        <LBRACKET> Exp() <RBRACKET>
     )
 |
     {}
@@ -174,7 +182,7 @@ void ExpList(): {}
 
 void ExpRest(): {}
 {
-    "," Exp()
+    <COMMA> Exp()
 }
 
 void Relational(): {}
@@ -184,7 +192,7 @@ void Relational(): {}
 
 void RelationalPrim(): {}
 {
-    "<" Relational()
+    <LT> Relational()
 |
     {}
 }
@@ -196,9 +204,9 @@ void Additive(): {}
 
 void AdditivePrim(): {}
 {
-    "+" Additive()
+    <PLUS> Additive()
 |
-    "-" Additive()
+    <MINUS> Additive()
 |
     {}
 }
@@ -210,7 +218,7 @@ void Multiplicative(): {}
 
 void MultiplicativePrim(): {}
 {
-    "*" Multiplicative()
+    <TIMES> Multiplicative()
 |
     {}
 }
@@ -227,9 +235,9 @@ void ExpTerminator(): {}
 |
     <THIS>
 |
-    <NEW> (<INT> "[" Exp() "]" | <ID> "(" ")")
+    <NEW> (<INT> <LBRACKET> Exp() <RBRACKET> | <ID> <LPAREN> <RPAREN>)
 |
-    "!" Exp()
+    <LNEG> Exp()
 |
-    "(" Exp() ")"
+    <LPAREN> Exp() <RPAREN>
 }
