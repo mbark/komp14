@@ -1,37 +1,32 @@
-#!/bin/sh
+#!/bin/bash
 
-compdir="$1"
+set -e
+set -o pipefail
 
-if [ ! -d "$compdir" ]
-  then
-    echo "error: compiler directory \"$compdir\" not found."
-    echo usage: $0 [COMPILER-SOURCE-DIR]
+compdir=$(readlink -f "$(dirname $0)/..")
+
+if [ -f $compdir/build.xml ] && \
+    [ -f $compdir/DESC ] && \
+    [ -d $compdir/src ] && \
+    [ -d $compdir/lib ] && \
+    [ -f $compdir/report.pdf ]; then
+    true
+else
+    echo "ERROR: Missing files in \"$compdir\"."
     exit 1
-  fi
+fi
 
-cd $compdir
+if [ ! -s $compdir/report.pdf ]; then
+    echo "NOTE: Empty report.pdf -- need to resubmit before oral presentation."
+fi
 
-if [ -f build.xml ] && [ -f DESC ] && [ -d src ] && [ -d lib ] && [ -f report.pdf ]
-  then true
-  else
-    echo "error: missing files in \"$compdir\"."
-    exit
-  fi
-
-if [ ! -s report.pdf ]
-  then
-    echo "NOTE: Empty report.pdf--need to resubmit before oral presentation"
-  fi
-
-if uuencode x </dev/null >/dev/null
-  then true
-  else
-    echo "error: The program \"uuencode\" is missing."
-    echo "       Please install GNU package sharutils."
+if uuencode x </dev/null >/dev/null; then
+    true
+else
+    echo "ERROR: The program \"uuencode\" is missing. Please install GNU package sharutils."
     exit 1
-  fi
+fi
 
-cd ..
+tar cf - $compdir --transform="s,${compdir:1},," | gzip | uuencode x | mailx -s '' submit@tigris.csc.kth.se
 
-tar cf - `basename $compdir` | gzip | uuencode x | mailx -s '' submit@tigris.csc.kth.se
 exit 0
