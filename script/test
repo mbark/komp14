@@ -1,0 +1,22 @@
+#!/bin/bash
+
+compdir=$(readlink -f "$(dirname $0)/..")
+scratch=$(mktemp)
+
+for program in `find $compdir/testcases/valid -name '*.java'`; do
+    java -cp $compdir/bin Parser "$(cat $program)" > "$scratch"
+    if [ $? -gt 0 ]; then
+        echo "ERROR: False negative for \"$program\""
+        cat "$scratch"
+    fi
+done
+
+for program in `find $compdir/testcases/invalid -name '*.java'`; do
+    java -cp $compdir/bin Parser "$(cat $program)" > "$scratch"
+    if [ $? -lt 1 ]; then
+        echo "ERROR: False positive for \"$program\""
+        cat "$scratch"
+    fi
+done
+
+rm "$scratch"
