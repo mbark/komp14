@@ -31,19 +31,108 @@ TOKEN: {
     <THIS: "this"> |
     <NEW: "new"> |
     <INT: "int"> |
+    <BOOLEAN: "boolean"> |
     <LENGTH: "length"> |
-    "." | "," |
+    <PUBLIC: "public"> |
+    <STATIC: "static"> |
+    <VOID: "void"> |
+    <CLASS: "class"> |
+    <RETURN: "return"> |
+    <STRING: "String"> |
+    "." | "," | ";" |
     "+" | "-" | "*" |
     "<" |
     "!" | "&&" |
     "(" | ")" | "[" | "]" | "{" | "}" |
+    <IF: "if"> |
+    <ELSE: "else"> |
+    <WHILE: "while"> |
     <INT_LIT: "0" | ["1"-"9"](["0"-"9"])*> |
     <ID: ["a"-"z", "A"-"Z", "_"](["a"-"z", "A"-"Z", "0"-"9", "_"])*>
 }
 
 void S(): {}
 {
-    Exp() <EOF>
+    MainClass() ( ClassDecl() )* <EOF>
+}
+
+void MainClass(): {}
+{
+    <CLASS> <ID>
+    "{"
+        <PUBLIC> <STATIC> <VOID> <ID> "(" <STRING> "[" "]" <ID> ")"
+        "{"
+            (
+                LOOKAHEAD(2)
+                VarDecl()
+            )*
+            ( Stmt() )*
+        "}"
+    "}"
+}
+
+void ClassDecl(): {}
+{
+    <CLASS> <ID>
+    "{"
+        ( VarDecl() )* ( MethodDecl() )*
+    "}"
+}
+
+void VarDecl(): {}
+{
+    Type() <ID> ";"
+}
+
+void MethodDecl(): {}
+{
+    <PUBLIC> Type() <ID> "(" FormalList() ")"
+    "{"
+        (
+            LOOKAHEAD(2)
+            VarDecl()
+        )*
+        ( Stmt() )*
+        <RETURN> Exp() ";"
+    "}"
+}
+
+void FormalList(): {}
+{
+    Type() <ID> ( FormalRest() )*
+|
+    {}
+}
+
+void FormalRest(): {}
+{
+    "," Type() <ID>
+}
+
+void Type(): {}
+{
+    <INT> ( "[" "]" )?
+|
+    <BOOLEAN>
+|
+    <ID>
+}
+
+void Stmt(): {}
+{
+    "{" ( Stmt() )* "}"
+|
+    <IF> "(" Exp() ")" Stmt() <ELSE> Stmt()
+|
+    <WHILE> "(" Exp() ")" Stmt()
+|
+    "System.out.println(" Exp() ")"
+|
+    <ID> (
+        "=" Exp() |
+        "[" Exp() "]" "=" Exp()
+    )
+    ";"
 }
 
 void Exp(): {}
@@ -51,7 +140,7 @@ void Exp(): {}
     Relational() ExpPrim()
 }
 
-
+// FIXME: Doesn't work properly
 void ExpPrim(): {}
 {
     "&&" Exp()
@@ -62,7 +151,9 @@ void ExpPrim(): {}
             <LENGTH>
         ) |
         "[" Exp() "]"
-    )*
+    )
+|
+    {}
 }
 
 void ExpList(): {}
