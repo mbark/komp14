@@ -1,6 +1,6 @@
 package tree;
 
-public class CONST extends Exp {
+public class CONST extends AbstractExp {
     public int value;
 
     public CONST(int v) {
@@ -11,7 +11,7 @@ public class CONST extends Exp {
         return null;
     }
 
-    public Exp build(ExpList kids) {
+    public AbstractExp build(ExpList kids) {
         return this;
     }
 }

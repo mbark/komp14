@@ -1,7 +1,7 @@
 package sparc;
 
 import temp.Temp;
-import tree.Exp;
+import tree.AbstractExp;
 import tree.TEMP;
 
 public class InReg implements frame.Access {
@@ -15,7 +15,7 @@ public class InReg implements frame.Access {
         return "sparc.InReg(" + reg.toString() + ")";
     }
 
-    public Exp exp(Exp basePointer) {
+    public AbstractExp exp(AbstractExp basePointer) {
         return new TEMP(reg);
     }
 }

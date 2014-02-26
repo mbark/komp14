@@ -1,9 +1,9 @@
 package tree;
 
 public class EXP extends Stm {
-    public Exp exp;
+    public AbstractExp exp;
 
-    public EXP(Exp e) {
+    public EXP(AbstractExp e) {
         exp = e;
     }
 

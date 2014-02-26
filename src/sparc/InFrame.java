@@ -2,7 +2,7 @@ package sparc;
 
 import tree.BINOP;
 import tree.CONST;
-import tree.Exp;
+import tree.AbstractExp;
 import tree.MEM;
 
 class InFrame implements frame.Access {
@@ -16,7 +16,7 @@ class InFrame implements frame.Access {
         return "sparc.InFrame(" + offset + ")";
     }
 
-    public Exp exp(Exp basePointer) {
+    public AbstractExp exp(AbstractExp basePointer) {
         // A small optimization for the special case offset == 0.
         // (This case occurs frequently with heap objects.)
         if (offset == 0) {

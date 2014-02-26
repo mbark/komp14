@@ -230,7 +230,7 @@ public class Print {
         say(")");
     }
 
-    void prExp(Exp e, int d) {
+    void prExp(AbstractExp e, int d) {
         if (e instanceof BINOP) {
             prExp((BINOP) e, d);
         } else if (e instanceof MEM) {
@@ -255,7 +255,7 @@ public class Print {
         say("\n");
     }
 
-    public void prExp(Exp e) {
+    public void prExp(AbstractExp e) {
         prExp(e, 0);
         say("\n");
     }

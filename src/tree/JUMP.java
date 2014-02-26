@@ -4,10 +4,10 @@ import temp.Label;
 import temp.LabelList;
 
 public class JUMP extends Stm {
-    public Exp exp;
+    public AbstractExp exp;
     public LabelList targets;
 
-    public JUMP(Exp e, LabelList t) {
+    public JUMP(AbstractExp e, LabelList t) {
         exp = e;
         targets = t;
     }

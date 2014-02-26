@@ -17,7 +17,7 @@ public class Canon {
         }
     }
 
-    static boolean commute(tree.Stm a, tree.Exp b) {
+    static boolean commute(tree.Stm a, tree.AbstractExp b) {
         return isNop(a) || b instanceof tree.NAME || b instanceof tree.CONST;
     }
 
@@ -68,7 +68,7 @@ public class Canon {
         return new tree.ESEQ(seq(stms, b.stm), b.exp);
     }
 
-    static tree.ESEQ do_exp(tree.Exp e) {
+    static tree.ESEQ do_exp(tree.AbstractExp e) {
         if (e instanceof tree.ESEQ) {
             return do_exp((tree.ESEQ) e);
         } else {
@@ -76,7 +76,7 @@ public class Canon {
         }
     }
 
-    static tree.ESEQ reorder_exp(tree.Exp e) {
+    static tree.ESEQ reorder_exp(tree.AbstractExp e) {
         StmExpList x = reorder(e.kids());
         return new tree.ESEQ(x.stm, e.build(x.exps));
     }
@@ -88,10 +88,10 @@ public class Canon {
         if (exps == null) {
             return nopNull;
         } else {
-            tree.Exp a = exps.head;
+            tree.AbstractExp a = exps.head;
             if (a instanceof tree.CALL) {
                 temp.Temp t = new temp.Temp();
-                tree.Exp e = new tree.ESEQ(new tree.MOVE(new tree.TEMP(t), a),
+                tree.AbstractExp e = new tree.ESEQ(new tree.MOVE(new tree.TEMP(t), a),
                         new tree.TEMP(t));
                 return reorder(new tree.ExpList(e, exps.tail));
             } else {

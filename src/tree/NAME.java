@@ -2,7 +2,7 @@ package tree;
 
 import temp.Label;
 
-public class NAME extends Exp {
+public class NAME extends AbstractExp {
     public Label label;
 
     public NAME(Label l) {
@@ -13,7 +13,7 @@ public class NAME extends Exp {
         return null;
     }
 
-    public Exp build(ExpList kids) {
+    public AbstractExp build(ExpList kids) {
         return this;
     }
 }

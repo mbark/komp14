@@ -35,7 +35,7 @@ public class View {
         addStm(s, top);
     }
 
-    public void addExp(Exp e) {
+    public void addExp(AbstractExp e) {
         addExp(e, top);
     }
 
@@ -219,7 +219,7 @@ public class View {
         parent.add(thisNode);
     }
 
-    void addExp(Exp e, DefaultMutableTreeNode parent) {
+    void addExp(AbstractExp e, DefaultMutableTreeNode parent) {
         if (e instanceof BINOP) {
             addExp((BINOP) e, parent);
         } else if (e instanceof MEM) {

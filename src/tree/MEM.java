@@ -1,9 +1,9 @@
 package tree;
 
-public class MEM extends Exp {
-    public Exp exp;
+public class MEM extends AbstractExp {
+    public AbstractExp exp;
 
-    public MEM(Exp e) {
+    public MEM(AbstractExp e) {
         exp = e;
     }
 
@@ -11,7 +11,7 @@ public class MEM extends Exp {
         return new ExpList(exp);
     }
 
-    public Exp build(ExpList kids) {
+    public AbstractExp build(ExpList kids) {
         return new MEM(kids.head);
     }
 }

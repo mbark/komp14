@@ -1,6 +1,6 @@
 package tree;
 
-public class TEMP extends Exp {
+public class TEMP extends AbstractExp {
     public temp.Temp temp;
 
     public TEMP(temp.Temp t) {
@@ -11,7 +11,7 @@ public class TEMP extends Exp {
         return null;
     }
 
-    public Exp build(ExpList kids) {
+    public AbstractExp build(ExpList kids) {
         return this;
     }
 }

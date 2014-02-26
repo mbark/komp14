@@ -1,10 +1,10 @@
 package tree;
 
-public class BINOP extends Exp {
+public class BINOP extends AbstractExp {
     public int binop;
-    public Exp left, right;
+    public AbstractExp left, right;
 
-    public BINOP(int b, Exp l, Exp r) {
+    public BINOP(int b, AbstractExp l, AbstractExp r) {
         binop = b;
         left = l;
         right = r;
@@ -25,7 +25,7 @@ public class BINOP extends Exp {
         return new ExpList(left, new ExpList(right));
     }
 
-    public Exp build(ExpList kids) {
+    public AbstractExp build(ExpList kids) {
         return new BINOP(binop, kids.head, kids.tail.head);
     }
 }

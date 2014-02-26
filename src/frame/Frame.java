@@ -6,7 +6,7 @@ import temp.Label;
 import temp.Temp;
 import temp.TempList;
 import temp.TempMap;
-import tree.Exp;
+import tree.AbstractExp;
 import tree.ExpList;
 import tree.Stm;
 
@@ -73,7 +73,7 @@ public interface Frame {
      *            The arguments to the function.
      * @return Tree code that calls the external function.
      */
-    public Exp externalCall(String func, ExpList args);
+    public AbstractExp externalCall(String func, ExpList args);
 
     /**
      * Appends tree code to move incoming arguments into the places where the

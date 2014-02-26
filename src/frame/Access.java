@@ -1,6 +1,6 @@
 package frame;
 
-import tree.Exp;
+import tree.AbstractExp;
 
 /**
  * Interface that models an "access" to a variable. The variable can be either
@@ -22,5 +22,5 @@ public interface Access {
      *            A Tree expression that evaluates to the base pointer.
      * @return A Tree expression that can be used to load or store the variable.
      */
-    public Exp exp(Exp basePointer);
+    public AbstractExp exp(AbstractExp basePointer);
 }

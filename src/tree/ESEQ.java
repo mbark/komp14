@@ -1,10 +1,10 @@
 package tree;
 
-public class ESEQ extends Exp {
+public class ESEQ extends AbstractExp {
     public Stm stm;
-    public Exp exp;
+    public AbstractExp exp;
 
-    public ESEQ(Stm s, Exp e) {
+    public ESEQ(Stm s, AbstractExp e) {
         stm = s;
         exp = e;
     }
@@ -13,7 +13,7 @@ public class ESEQ extends Exp {
         throw new Error("kids() not applicable to ESEQ");
     }
 
-    public Exp build(ExpList kids) {
+    public AbstractExp build(ExpList kids) {
         throw new Error("build() not applicable to ESEQ");
     }
 }

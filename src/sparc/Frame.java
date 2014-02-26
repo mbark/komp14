@@ -9,7 +9,7 @@ import temp.TempMap;
 import tree.CALL;
 import tree.CONST;
 import tree.EXP;
-import tree.Exp;
+import tree.AbstractExp;
 import tree.ExpList;
 import tree.MOVE;
 import tree.NAME;
@@ -109,7 +109,7 @@ public class Frame implements frame.Frame {
         }
     }
 
-    public Exp externalCall(String func, ExpList args) {
+    public AbstractExp externalCall(String func, ExpList args) {
         return new CALL(new NAME(new Label(func)), args);
     }
 

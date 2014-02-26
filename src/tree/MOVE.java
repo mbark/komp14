@@ -1,9 +1,9 @@
 package tree;
 
 public class MOVE extends Stm {
-    public Exp dst, src;
+    public AbstractExp dst, src;
 
-    public MOVE(Exp d, Exp s) {
+    public MOVE(AbstractExp d, AbstractExp s) {
         dst = d;
         src = s;
     }
