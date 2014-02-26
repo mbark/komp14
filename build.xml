@@ -7,7 +7,7 @@
     </path>
     <target name="init">
         <mkdir dir="bin"/>
-        <javacc target="src/Parser.jj" outputdirectory="src" javacchome="lib" />
+        <javacc target="src/mjc/Parser.jj" outputdirectory="src/mjc" javacchome="lib" />
     </target>
     <target name="clean">
         <delete dir="bin"/>

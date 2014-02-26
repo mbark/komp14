@@ -1,0 +1,353 @@
+PARSER_BEGIN(Parser)
+
+package mjc;
+
+import syntaxtree.*;
+
+public class Parser {
+    public static void main(String[] args) throws Exception {
+        try {
+            new Parser(new java.io.StringReader(args[0])).Program();
+            System.out.println("Syntax is okay");
+        } catch (Throwable e) {
+            System.out.println("Syntax check failed: " + e.getMessage());
+            System.exit(1);
+        }
+    }
+}
+
+PARSER_END(Parser)
+
+SKIP: {
+    " " |
+    "\t" |
+    "\n" |
+    "\r"
+}
+
+/* Reserved keywords. */
+TOKEN: {
+    <BOOLEAN: "boolean"> |
+    <CLASS: "class"> |
+    <ELSE: "else"> |
+    <IF: "if"> |
+    <INT: "int"> |
+    <LENGTH: "length"> |
+    <NEW: "new"> |
+    <PUBLIC: "public"> |
+    <RETURN: "return"> |
+    <STATIC: "static"> |
+    <STRING: "String"> |
+    <SYSOUT: "System.out.println"> |
+    <THIS: "this"> |
+    <VOID: "void"> |
+    <WHILE: "while">
+}
+
+/* Operators. */
+TOKEN: {
+    <ASSIGN: "="> |
+    <LAND: "&&"> |
+    <LNEG: "!"> |
+    <LT: "<"> |
+    <MINUS: "-"> |
+    <PLUS: "+"> |
+    <TIMES: "*">
+}
+
+/* Misc. */
+TOKEN: {
+    <COMMA: ","> |
+    <DOT: "."> |
+    <LBRACE: "{"> | <RBRACE: "}"> |
+    <LBRACKET: "["> | <RBRACKET: "]"> |
+    <LPAREN: "("> | <RPAREN: ")"> |
+    <SEMICOLON: ";">
+}
+
+/* Literals and identifiers. */
+TOKEN: {
+    <TRUE: "true"> |
+    <FALSE: "false"> |
+    <INT_LIT: "0" | ["1"-"9"](["0"-"9"])*> |
+    <ID: ["a"-"z", "A"-"Z", "_"](["a"-"z", "A"-"Z", "0"-"9", "_"])*>
+}
+
+Program Program(): {
+    MainClass mc;
+    ClassDecl cd;
+    ClassDeclList cdl = new ClassDeclList();
+}
+{
+    mc = MainClass()
+    ( cd = ClassDecl() { cdl.addElement(cd); } )*
+    <EOF>
+    {
+        return new Program(mc, cdl);
+    }
+}
+
+// FIXME: What to do with VarDeclList?
+MainClass MainClass(): {
+    Token klass, main, args;
+    VarDecl vd;
+    VarDeclList vdl = new VarDeclList();
+    Statement s;
+    StatementList sl = new StatementList();
+}
+{
+    <CLASS> klass = <ID>
+    <LBRACE>
+        <PUBLIC> <STATIC> <VOID> main = <ID> <LPAREN> <STRING> <LBRACKET> <RBRACKET> args = <ID> <RPAREN>
+        <LBRACE>
+            ( LOOKAHEAD(2) vd = VarDecl() { vdl.addElement(vd); } )*
+            ( s = Stmt() { sl.addElement(s); } )*
+        <RBRACE>
+    <RBRACE>
+    {
+        if(!main.equals("main"))
+        {
+            throw new ParseException();
+        }
+        return new MainClass(new Identifier(klass), new Identifier(args), new Block(sl));
+    }
+}
+
+ClassDecl ClassDecl(): {
+    Token id;
+    VarDecl vd;
+    VarDeclList vdl = new VarDeclList();
+    MethodDecl md;
+    MethodDeclList mdl = new MethodDeclList();
+}
+{
+    <CLASS> id = <ID>
+    <LBRACE>
+        ( vd = VarDecl() { vdl.addElement(vd); } )*
+        ( md = MethodDecl() { mdl.addElement(md); } )*
+    <RBRACE>
+    {
+        return new ClassDeclSimple(new Identifier(id), vdl, mdl);
+    }
+}
+
+VarDecl VarDecl(): {
+    Type type;
+    Token id;
+}
+{
+    type = Type() id = <ID> <SEMICOLON>
+    {
+        return new VarDecl(type, new Identifier(id));
+    }
+}
+
+MethodDecl MethodDecl(): {
+    Type type;
+    Token id;
+    FormalList fl;
+    VarDecl vd;
+    VarDeclList vdl = new VarDeclList();
+    Statement s;
+    StatementList sl = new StatementList();
+    Exp exp;
+}
+{
+    <PUBLIC> type = Type() id = <ID> <LPAREN> fl = FormalList() <RPAREN>
+    <LBRACE>
+        ( LOOKAHEAD(2) vd = VarDecl() { vdl.addElement(vd); } )*
+        ( s = Stmt() { sl.addElement(s); } )*
+        <RETURN> exp = Exp() <SEMICOLON>
+    <RBRACE>
+    {
+        return new MethodDecl(type, new Identifier(id), fl, vdl, sl, exp);
+    }
+}
+
+FormalList FormalList(): {
+    Type type;
+    Token id;
+    Formal f;
+    FormalList fl = new FormalList();
+}
+{
+    type = Type() id = <ID> { fl.addElement(new Formal(type, new Identifier(id))); }
+    ( f = FormalRest() { fl.addElement(f); } )*
+    {
+        return fl;
+    }
+|
+    {}
+    {
+        return fl;
+    }
+}
+
+Formal FormalRest(): {
+    Type type;
+    Token id;
+}
+{
+    <COMMA> type = Type() id = <ID>
+    {
+        return new Formal(type, new Identifier(id));
+    }
+}
+
+Type Type(): {
+    Token id;
+}
+{
+    LOOKAHEAD(2)
+    <INT> <LBRACKET> <RBRACKET>
+    {
+        return new IntArrayType();
+    }
+|
+    <INT>
+    {
+        return new IntegerType();
+    }
+|
+    <BOOLEAN>
+    {
+        return new BooleanType();
+    }
+|
+    id = <ID>
+    {
+        return new IdentifierType(id);
+    }
+}
+
+Statement Stmt(): {
+    Statement s1, s2;
+    StatementList sl = new StatementList();
+    Exp e1, e2;
+    Token id;
+}
+{
+    <LBRACE> ( s1 = Stmt() { sl.addElement(s1); } )* <RBRACE>
+    {
+        return new Block(sl);
+    }
+|
+    <IF> <LPAREN> e1 = Exp() <RPAREN> s1 = Stmt() <ELSE> s2 = Stmt()
+    {
+        return new If(e1, s1, s2);
+    }
+|
+    <WHILE> <LPAREN> e1 = Exp() <RPAREN> s1 = Stmt()
+    {
+        return new While(e1, s1);
+    }
+|
+    <SYSOUT> <LPAREN> e1 = Exp() <RPAREN> <SEMICOLON>
+    {
+        return new Print(e1);
+    }
+|
+    LOOKAHEAD(2)
+    id = <ID> <ASSIGN> e1 = Exp() <SEMICOLON>
+    {
+        return new Assign(new Identifier(id), e1);
+    }
+|
+    id = <ID> <LBRACKET> e1 = Exp() <RBRACKET> <ASSIGN> e2 = Exp() <SEMICOLON>
+    {
+        return new ArrayAssign(new Identifier(id), e1, e2);
+    }
+}
+
+Exp Exp(): {}
+{
+    Relational() ExpPrim()
+    {
+        return new False();
+    }
+}
+
+// FIXME: Doesn't work properly
+void ExpPrim(): {}
+{
+    <LAND> Exp()
+|
+    (
+        <DOT> (
+            <ID> <LPAREN> ExpList() <RPAREN> |
+            <LENGTH>
+        ) |
+        <LBRACKET> Exp() <RBRACKET>
+    )
+|
+    {}
+}
+
+void ExpList(): {}
+{
+    Exp() ( ExpRest() )*
+|
+    {}
+}
+
+void ExpRest(): {}
+{
+    <COMMA> Exp()
+}
+
+void Relational(): {}
+{
+    Additive() RelationalPrim()
+}
+
+void RelationalPrim(): {}
+{
+    <LT> Relational()
+|
+    {}
+}
+
+void Additive(): {}
+{
+    Multiplicative() AdditivePrim()
+}
+
+void AdditivePrim(): {}
+{
+    <PLUS> Additive()
+|
+    <MINUS> Additive()
+|
+    {}
+}
+
+void Multiplicative(): {}
+{
+    ExpTerminator() MultiplicativePrim()
+}
+
+void MultiplicativePrim(): {}
+{
+    <TIMES> Multiplicative()
+|
+    {}
+}
+
+void ExpTerminator(): {}
+{
+    <INT_LIT>
+|
+    <TRUE>
+|
+    <FALSE>
+|
+    <ID>
+|
+    <THIS>
+|
+    <NEW> (<INT> <LBRACKET> Exp() <RBRACKET> | <ID> <LPAREN> <RPAREN>)
+|
+    <LNEG> Exp()
+|
+    <LPAREN> Exp() <RPAREN>
+}

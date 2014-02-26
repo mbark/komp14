@@ -1,5 +1,6 @@
 package syntaxtree;
 
+import mjc.Token;
 import visitor.TypeVisitor;
 import visitor.Visitor;
 
@@ -15,6 +16,10 @@ public class IdentifierType extends Type {
 
     public IdentifierType(String as) {
         s = as;
+    }
+
+    public IdentifierType(Token t) {
+        s = t.toString();
     }
 
     public void accept(Visitor v) {
