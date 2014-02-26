@@ -4,7 +4,7 @@ class Main {
         int[] a;
         aux = new Aux();
         a = new int[10];
-        aux.doTheThing(a);
+        aux = aux.doTheThing(a);
         System.out.println(0);
     }
 }
@@ -21,6 +21,9 @@ class Aux {
             if(!true)
             {
                 arr[i] = 1;
+            }
+            else
+            {
             }
         }
         return this;
