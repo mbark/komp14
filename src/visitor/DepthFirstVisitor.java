@@ -8,8 +8,10 @@ import syntaxtree.Assign;
 import syntaxtree.Block;
 import syntaxtree.BooleanType;
 import syntaxtree.Call;
+import syntaxtree.ClassDecl;
 import syntaxtree.ClassDeclExtends;
 import syntaxtree.ClassDeclSimple;
+import syntaxtree.Exp;
 import syntaxtree.False;
 import syntaxtree.Formal;
 import syntaxtree.Identifier;
@@ -29,6 +31,7 @@ import syntaxtree.Not;
 import syntaxtree.Plus;
 import syntaxtree.Print;
 import syntaxtree.Program;
+import syntaxtree.Statement;
 import syntaxtree.This;
 import syntaxtree.Times;
 import syntaxtree.True;
@@ -39,14 +42,22 @@ public class DepthFirstVisitor implements Visitor {
 
     @Override
     public void visit(Program n) {
-        // TODO Auto-generated method stub
-
+        visit(n.m);
+        for (int i = 0; i < n.cl.size(); i++) {
+            ClassDecl cd = n.cl.elementAt(i);
+            if (cd instanceof ClassDeclSimple) {
+                visit((ClassDeclSimple) cd);
+            } else if (cd instanceof ClassDeclExtends) {
+                visit((ClassDeclExtends) cd);
+            }
+        }
     }
 
     @Override
     public void visit(MainClass n) {
-        // TODO Auto-generated method stub
-
+        visit(n.i1);
+        visit(n.i2);
+        visit(n.s);
     }
 
     @Override
@@ -123,8 +134,7 @@ public class DepthFirstVisitor implements Visitor {
 
     @Override
     public void visit(Print n) {
-        // TODO Auto-generated method stub
-
+        visit(n.e);
     }
 
     @Override
@@ -239,6 +249,18 @@ public class DepthFirstVisitor implements Visitor {
     public void visit(Identifier n) {
         // TODO Auto-generated method stub
 
+    }
+
+    private void visit(Exp e) {
+        if (e instanceof IntegerLiteral) {
+            visit((IntegerLiteral) e);
+        }
+    }
+
+    private void visit(Statement s) {
+        if (s instanceof Print) {
+            visit((Print) s);
+        }
     }
 
 }
