@@ -18,11 +18,33 @@ public class Parser {
 
 PARSER_END(Parser)
 
+/* Whitespace. */
 SKIP: {
     " " |
     "\t" |
     "\n" |
     "\r"
+}
+
+/* Comments. */
+SKIP:
+{
+    "/*" : IN_COMMENT
+}
+
+<IN_COMMENT> SKIP:
+{
+    "*/"
+    {
+        SwitchTo(DEFAULT);
+    }
+|
+    <~[]>
+}
+
+SKIP:
+{
+    <"//" (~["\n"])* "\n">
 }
 
 /* Reserved keywords. */
