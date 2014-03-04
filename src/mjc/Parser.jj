@@ -105,7 +105,7 @@ MainClass MainClass(): {
         <RBRACE>
     <RBRACE>
     {
-        if(!main.equals("main"))
+        if(!main.toString().equals("main"))
         {
             throw new ParseException();
         }
