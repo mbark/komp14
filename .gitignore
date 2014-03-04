@@ -6,5 +6,6 @@
 *.out
 *.pdf
 *.war
+DESC
 bin/
 src/mjc/*.java
