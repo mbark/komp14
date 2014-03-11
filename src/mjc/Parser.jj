@@ -4,16 +4,7 @@ package mjc;
 
 import syntaxtree.*;
 
-public class Parser {
-    public static void main(String[] args) throws Exception {
-        try {
-            new Parser(new java.io.StringReader(args[0])).Program();
-            System.out.println("Syntax is okay");
-        } catch (Throwable e) {
-            System.out.println("Syntax check failed: " + e.getMessage());
-            System.exit(1);
-        }
-    }
+class Parser {
 }
 
 PARSER_END(Parser)

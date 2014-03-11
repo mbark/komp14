@@ -269,13 +269,4 @@ public class SyntaxTreePrinter extends visitor.DepthFirstVisitor {
         out.println(indent() + "(" + name + "[ " + n.i + " ]");
         ++level;
     }
-
-    public static void main(String[] args) {
-        MainClass am = new MainClass(new Identifier("a"), new Identifier("b"),
-                new Print(new IntegerLiteral(0)));
-        ClassDeclList acl = new ClassDeclList();
-        Program p = new Program(am, acl);
-        SyntaxTreePrinter stp = new SyntaxTreePrinter(System.out);
-        stp.visit(p);
-    }
 }
