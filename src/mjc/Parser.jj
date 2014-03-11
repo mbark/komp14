@@ -285,93 +285,170 @@ Exp Exp(): {
     Exp e1, e2;
 }
 {
-    Relational()
+    e1 = Relational()
     (
         LOOKAHEAD(2)
-        <LAND> Relational()
+        <LAND> e2 = Relational()
+        {
+            e1 = new And(e1, e2);
+        }
     )*
     {
-        return new False();
+        return e1;
     }
 }
 
-void ExpList(): {}
+ExpList ExpList(): {
+    Exp e;
+    ExpList el = new ExpList();
+}
 {
-    Exp() ( ExpRest() )*
+    e = Exp() { el.addElement(e); }
+    ( e = ExpRest() { el.addElement(e);} )*
+    {
+        return el;
+    }
 |
     {}
+    {
+        return el;
+    }
 }
 
-void ExpRest(): {}
+Exp ExpRest(): {
+    Exp e;
+}
 {
-    <COMMA> Exp()
+    <COMMA> e = Exp()
+    {
+        return e;
+    }
 }
 
-void Relational(): {}
+Exp Relational(): {
+    Exp e1, e2;
+}
 {
-    Additive()
+    e1 = Additive()
     (
         LOOKAHEAD(2)
-        <LT> Additive()
+        <LT> e2 = Additive()
+        {
+            e1 = new LessThan(e1, e2);
+        }
     )*
+    {
+        return e1;
+    }
 }
 
-void Additive(): {}
+Exp Additive(): {
+    Exp e1, e2;
+}
 {
-    Multiplicative()
+    e1 = Multiplicative()
     (
         LOOKAHEAD(2)
         (
-            <PLUS> Multiplicative()
+            <PLUS> e2 = Multiplicative() { e1 = new Plus(e1, e2); }
             |
-            <MINUS> Multiplicative()
+            <MINUS> e2 = Multiplicative() { e1 = new Minus(e1, e2); }
         )
     )*
+    {
+        return e1;
+    }
 }
 
-void Multiplicative(): {}
+Exp Multiplicative(): {
+    Exp e1, e2;
+}
 {
-    ExpTerminator()
+    e1 = ExpTerminator()
     (
         LOOKAHEAD(2)
-        <TIMES> ExpTerminator()
+        <TIMES> e2 = ExpTerminator() { e1 = new Times(e1, e2); }
     )*
+    {
+        return e1;
+    }
 }
 
-void ExpTerminator(): {}
+Exp ExpTerminator(): {
+    Token id;
+    Exp e1, e2;
+    ExpList el;
+}
 {
     (
-        <INT_LIT>
+        id = <INT_LIT>
+        {
+            e1 = new IntegerLiteral(Integer.parseInt(id.toString()));
+        }
     |
         <TRUE>
+        {
+            e1 = new True();
+        }
     |
         <FALSE>
+        {
+            e1 = new False();
+        }
     |
-        <ID>
+        id = <ID>
+        {
+            e1 = new IdentifierExp(id.toString());
+        }
     |
         <THIS>
+        {
+            e1 = new This();
+        }
     |
-        <NEW> (<INT> <LBRACKET> Exp() <RBRACKET> | <ID> <LPAREN> <RPAREN>)
+        <NEW>
+        (
+            <INT> <LBRACKET> e2 = Exp() <RBRACKET>
+            {
+                e1 = new NewArray(e2);
+            }
+        |
+            id = <ID> <LPAREN> <RPAREN>
+            {
+                e1 = new NewObject(new Identifier(id));
+            }
+        )
     |
-        <LNEG> Exp()
+        <LNEG> e2 = Exp()
+        {
+            e1 = new Not(e2);
+        }
     |
-        <LPAREN> Exp() <RPAREN>
+        <LPAREN> e1 = Exp() <RPAREN>
     )
     (
         LOOKAHEAD(2)
         (
+            <DOT>
             (
-                <DOT>
-                (
-                    <ID> <LPAREN> ExpList() <RPAREN>
-                |
-                    <LENGTH>
-                )
+                id = <ID> <LPAREN> el = ExpList() <RPAREN>
+                {
+                    e1 = new Call(e1, new Identifier(id), el);
+                }
+            |
+                <LENGTH>
+                {
+                    e1 = new ArrayLength(e1);
+                }
             )
         |
-            (
-                <LBRACKET> Exp() <RBRACKET>
-            )
+            <LBRACKET> e2 = Exp() <RBRACKET>
+            {
+                e1 = new ArrayLookup(e1, e2);
+            }
         )
     )*
+    {
+        return e1;
+    }
 }
