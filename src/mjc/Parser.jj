@@ -281,28 +281,18 @@ Statement Stmt(): {
     }
 }
 
-Exp Exp(): {}
+Exp Exp(): {
+    Exp e1, e2;
+}
 {
-    Relational() ExpPrim()
+    Relational()
+    (
+        LOOKAHEAD(2)
+        <LAND> Relational()
+    )*
     {
         return new False();
     }
-}
-
-// FIXME: Doesn't work properly
-void ExpPrim(): {}
-{
-    <LAND> Exp()
-|
-    (
-        <DOT> (
-            <ID> <LPAREN> ExpList() <RPAREN> |
-            <LENGTH>
-        ) |
-        <LBRACKET> Exp() <RBRACKET>
-    )
-|
-    {}
 }
 
 void ExpList(): {}
@@ -319,57 +309,69 @@ void ExpRest(): {}
 
 void Relational(): {}
 {
-    Additive() RelationalPrim()
-}
-
-void RelationalPrim(): {}
-{
-    <LT> Relational()
-|
-    {}
+    Additive()
+    (
+        LOOKAHEAD(2)
+        <LT> Additive()
+    )*
 }
 
 void Additive(): {}
 {
-    Multiplicative() AdditivePrim()
-}
-
-void AdditivePrim(): {}
-{
-    <PLUS> Additive()
-|
-    <MINUS> Additive()
-|
-    {}
+    Multiplicative()
+    (
+        LOOKAHEAD(2)
+        (
+            <PLUS> Multiplicative()
+            |
+            <MINUS> Multiplicative()
+        )
+    )*
 }
 
 void Multiplicative(): {}
 {
-    ExpTerminator() MultiplicativePrim()
-}
-
-void MultiplicativePrim(): {}
-{
-    <TIMES> Multiplicative()
-|
-    {}
+    ExpTerminator()
+    (
+        LOOKAHEAD(2)
+        <TIMES> ExpTerminator()
+    )*
 }
 
 void ExpTerminator(): {}
 {
-    <INT_LIT>
-|
-    <TRUE>
-|
-    <FALSE>
-|
-    <ID>
-|
-    <THIS>
-|
-    <NEW> (<INT> <LBRACKET> Exp() <RBRACKET> | <ID> <LPAREN> <RPAREN>)
-|
-    <LNEG> Exp()
-|
-    <LPAREN> Exp() <RPAREN>
+    (
+        <INT_LIT>
+    |
+        <TRUE>
+    |
+        <FALSE>
+    |
+        <ID>
+    |
+        <THIS>
+    |
+        <NEW> (<INT> <LBRACKET> Exp() <RBRACKET> | <ID> <LPAREN> <RPAREN>)
+    |
+        <LNEG> Exp()
+    |
+        <LPAREN> Exp() <RPAREN>
+    )
+    (
+        LOOKAHEAD(2)
+        (
+            (
+                <DOT>
+                (
+                    <ID> <LPAREN> ExpList() <RPAREN>
+                |
+                    <LENGTH>
+                )
+            )
+        |
+            (
+                <LBRACKET> Exp() <RBRACKET>
+            )
+        )
+    )*
 }

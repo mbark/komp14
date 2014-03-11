@@ -15,17 +15,24 @@ class Aux {
     public Aux doTheThing(int[] arr)
     {
         int i;
+        Aux aux;
+        boolean b;
+
         i = 0;
         while(i < 0)
         {
             if(!true)
             {
-                arr[i] = 1;
+                b = arr[arr.length] + 9 < 17 && !(arr[0] * 7 < 1717);
+                arr[i] = 4711;
             }
             else
             {
             }
         }
+        aux = new Aux();
+        aux = aux.doTheThing(arr);
+
         return this;
     }
 }
