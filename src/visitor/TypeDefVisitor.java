@@ -1,5 +1,9 @@
-package symbol;
+package visitor;
 
+import symbol.ClassTable;
+import symbol.MethodTable;
+import symbol.ProgramTable;
+import symbol.Symbol;
 import syntaxtree.ClassDeclExtends;
 import syntaxtree.ClassDeclSimple;
 import syntaxtree.Formal;
@@ -10,7 +14,6 @@ import syntaxtree.Program;
 import syntaxtree.Type;
 import syntaxtree.VarDecl;
 import syntaxtree.VoidType;
-import visitor.AbstractTypeDefVisitor;
 import error.ErrorMsg;
 
 public class TypeDefVisitor extends AbstractTypeDefVisitor {

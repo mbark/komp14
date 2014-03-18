@@ -2,8 +2,8 @@ package mjc;
 
 import java.io.StringReader;
 
-import symbol.TypeDefVisitor;
 import syntaxtree.Program;
+import visitor.TypeDefVisitor;
 
 public class JVMMain {
 
