@@ -7,6 +7,7 @@ public class ProgramTable {
     private HashMap<Symbol, ClassTable> classes;
     
     public ProgramTable() {
+        classes = new HashMap<Symbol, ClassTable>();
     }
 
     public boolean put(Symbol key, ClassTable value) {

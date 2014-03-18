@@ -12,6 +12,9 @@ public class ClassTable {
     
     public ClassTable(Symbol id) {
         this.id = id;
+
+        fields = new HashMap<Symbol, Type>();
+        methods = new HashMap<Symbol, MethodTable>();
     }
     
     public Symbol getId() {

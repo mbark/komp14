@@ -15,6 +15,9 @@ public class MethodTable {
     public MethodTable(Symbol id, Type returnType) {
         this.id = id;
         this.returnType = returnType;
+
+        params = new HashMap<Symbol, Type>();
+        locals = new HashMap<Symbol, Type>();
     }
     
     public Symbol getId() {
