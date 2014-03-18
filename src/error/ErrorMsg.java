@@ -15,4 +15,9 @@ public class ErrorMsg {
         anyErrors = true;
         out.println(msg);
     }
+
+    public boolean hasAnyErrors() {
+        return anyErrors;
+    }
+
 }

@@ -23,13 +23,18 @@ public class TypeDefVisitor extends AbstractTypeDefVisitor {
         currProgram = null;
         currMethod = null;
         currClass = null;
+        error = new ErrorMsg(System.err);
     }
 
     @Override
     public void visit(Program n) {
         currProgram = new ProgramTable();
         super.visit(n);
-        System.out.println(currProgram);
+        if (!error.hasAnyErrors()) {
+            System.out.println(currProgram);
+        } else {
+            System.exit(1);
+        }
     }
 
     @Override
