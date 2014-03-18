@@ -34,6 +34,7 @@ import syntaxtree.Times;
 import syntaxtree.True;
 import syntaxtree.Type;
 import syntaxtree.VarDecl;
+import syntaxtree.VoidType;
 import syntaxtree.While;
 import visitor.DepthFirstVisitor;
 import error.ErrorMsg;
@@ -61,7 +62,14 @@ public class TypeCheckPhaseOneVisitor extends DepthFirstVisitor {
     @Override
     public void visit(MainClass n) {
         currClass = new ClassTable(convertToSymbol(n.i1));
+        currMethod = new MethodTable(Symbol.symbol("main"), new VoidType());
+        // FIXME: String?
+        currMethod.putParam(convertToSymbol(n.i2), new VoidType());
+
         super.visit(n);
+
+        currClass.put(currMethod.getId(), currMethod);
+        currMethod = null;
         currProgram.put(currClass.getId(), currClass);
     }
 
@@ -97,6 +105,7 @@ public class TypeCheckPhaseOneVisitor extends DepthFirstVisitor {
         currMethod = new MethodTable(convertToSymbol(n.i), n.t);
         super.visit(n);
         currClass.put(currMethod.getId(), currMethod);
+        currMethod = null;
     }
 
     @Override
