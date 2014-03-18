@@ -8,10 +8,7 @@ import syntaxtree.Assign;
 import syntaxtree.Block;
 import syntaxtree.BooleanType;
 import syntaxtree.Call;
-import syntaxtree.ClassDeclExtends;
-import syntaxtree.ClassDeclSimple;
 import syntaxtree.False;
-import syntaxtree.Formal;
 import syntaxtree.Identifier;
 import syntaxtree.IdentifierExp;
 import syntaxtree.IdentifierType;
@@ -20,58 +17,19 @@ import syntaxtree.IntArrayType;
 import syntaxtree.IntegerLiteral;
 import syntaxtree.IntegerType;
 import syntaxtree.LessThan;
-import syntaxtree.MainClass;
-import syntaxtree.MethodDecl;
 import syntaxtree.Minus;
 import syntaxtree.NewArray;
 import syntaxtree.NewObject;
 import syntaxtree.Not;
 import syntaxtree.Plus;
 import syntaxtree.Print;
-import syntaxtree.Program;
 import syntaxtree.This;
 import syntaxtree.Times;
 import syntaxtree.True;
-import syntaxtree.VarDecl;
 import syntaxtree.VoidType;
 import syntaxtree.While;
 
 public abstract class AbstractTypeDefVisitor extends DepthFirstVisitor {
-
-    @Override
-    public void visit(Program n) {
-        super.visit(n);
-    }
-
-    @Override
-    public void visit(MainClass n) {
-        super.visit(n);
-    }
-
-    @Override
-    public void visit(ClassDeclSimple n) {
-        super.visit(n);
-    }
-
-    @Override
-    public void visit(ClassDeclExtends n) {
-        super.visit(n);
-    }
-
-    @Override
-    public void visit(VarDecl n) {
-        super.visit(n);
-    }
-
-    @Override
-    public void visit(MethodDecl n) {
-        super.visit(n);
-    }
-
-    @Override
-    public void visit(Formal n) {
-        super.visit(n);
-    }
 
     @Override
     public void visit(IntArrayType n) {
