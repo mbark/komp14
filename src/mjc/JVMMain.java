@@ -2,7 +2,7 @@ package mjc;
 
 import java.io.StringReader;
 
-import symbol.TypeCheckPhaseOneVisitor;
+import symbol.TypeDefVisitor;
 import syntaxtree.Program;
 
 public class JVMMain {
@@ -10,7 +10,7 @@ public class JVMMain {
     public static void main(String[] args) {
         try {
             Program p = new Parser(new StringReader(args[0])).Program();
-            TypeCheckPhaseOneVisitor stp = new TypeCheckPhaseOneVisitor();
+            TypeDefVisitor stp = new TypeDefVisitor();
             stp.visit(p);
         } catch (Throwable e) {
             System.out.println("Syntax check failed: " + e.getMessage());
