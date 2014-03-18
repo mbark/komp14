@@ -11,7 +11,7 @@ public class MethodTable {
 
     private HashMap<Symbol, Type> params;
     private HashMap<Symbol, Type> locals;
-    
+
     public MethodTable(Symbol id, Type returnType) {
         this.id = id;
         this.returnType = returnType;
@@ -19,17 +19,17 @@ public class MethodTable {
         params = new HashMap<Symbol, Type>();
         locals = new HashMap<Symbol, Type>();
     }
-    
+
     public Symbol getId() {
         return id;
     }
-    
+
     public Type getReturnType() {
         return returnType;
     }
-    
+
     public boolean putParam(Symbol key, Type value) {
-        if(params.containsKey(key)) {
+        if (params.containsKey(key)) {
             return false;
         }
         params.put(key, value);
@@ -39,9 +39,9 @@ public class MethodTable {
     public Type getParam(Symbol key) {
         return params.get(key);
     }
-    
+
     public boolean putLocal(Symbol key, Type value) {
-        if(locals.containsKey(key)) {
+        if (locals.containsKey(key)) {
             return false;
         }
         locals.put(key, value);
@@ -53,7 +53,19 @@ public class MethodTable {
     }
 
     public Iterator<Symbol> keys() {
-     // TODO: Proper iteration?
+        // TODO: Proper iteration?
         return null;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("MethodTable");
+        sb.append("(" + returnType + ")");
+        sb.append("<param=");
+        sb.append(params.toString());
+        sb.append(", locals=");
+        sb.append(locals.toString());
+        sb.append(">");
+        return sb.toString();
     }
 }

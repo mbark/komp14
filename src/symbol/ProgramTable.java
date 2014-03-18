@@ -5,13 +5,13 @@ import java.util.Iterator;
 
 public class ProgramTable {
     private HashMap<Symbol, ClassTable> classes;
-    
+
     public ProgramTable() {
         classes = new HashMap<Symbol, ClassTable>();
     }
 
     public boolean put(Symbol key, ClassTable value) {
-        if(classes.containsKey(key)) {
+        if (classes.containsKey(key)) {
             return false;
         }
         classes.put(key, value);
@@ -23,7 +23,16 @@ public class ProgramTable {
     }
 
     public Iterator<Symbol> keys() {
-     // TODO: Proper iteration?
+        // TODO: Proper iteration?
         return null;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("ProgramTable");
+        sb.append("<classes=");
+        sb.append(classes.toString());
+        sb.append(">");
+        return sb.toString();
     }
 }
