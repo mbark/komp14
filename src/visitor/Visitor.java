@@ -33,6 +33,7 @@ import syntaxtree.This;
 import syntaxtree.Times;
 import syntaxtree.True;
 import syntaxtree.VarDecl;
+import syntaxtree.VoidType;
 import syntaxtree.While;
 
 public interface Visitor {
@@ -77,6 +78,8 @@ public interface Visitor {
     public void visit(BooleanType n);
 
     public void visit(IntegerType n);
+
+    public void visit(VoidType n);
 
     // String s;
     public void visit(IdentifierType n);

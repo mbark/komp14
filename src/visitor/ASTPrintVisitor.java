@@ -41,6 +41,7 @@ import syntaxtree.This;
 import syntaxtree.Times;
 import syntaxtree.True;
 import syntaxtree.VarDecl;
+import syntaxtree.VoidType;
 import syntaxtree.While;
 
 public class ASTPrintVisitor implements Visitor {
@@ -189,6 +190,11 @@ public class ASTPrintVisitor implements Visitor {
 
     public void visit(IntegerType n) {
         System.out.print("IntegerType()");
+    }
+
+    @Override
+    public void visit(VoidType n) {
+        System.out.print("VoidType()");
     }
 
     // String s;
@@ -385,4 +391,5 @@ public class ASTPrintVisitor implements Visitor {
     public void visit(Identifier n) {
         System.out.print("Identifier(" + n.s + ")");
     }
+
 }

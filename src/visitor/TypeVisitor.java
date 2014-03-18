@@ -34,6 +34,7 @@ import syntaxtree.Times;
 import syntaxtree.True;
 import syntaxtree.Type;
 import syntaxtree.VarDecl;
+import syntaxtree.VoidType;
 import syntaxtree.While;
 
 public interface TypeVisitor {
@@ -78,6 +79,8 @@ public interface TypeVisitor {
     public Type visit(BooleanType n);
 
     public Type visit(IntegerType n);
+
+    public Type visit(VoidType n);
 
     // String s;
     public Type visit(IdentifierType n);

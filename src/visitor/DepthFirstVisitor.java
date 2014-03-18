@@ -42,6 +42,7 @@ import syntaxtree.True;
 import syntaxtree.Type;
 import syntaxtree.VarDecl;
 import syntaxtree.VarDeclList;
+import syntaxtree.VoidType;
 import syntaxtree.While;
 
 public class DepthFirstVisitor implements Visitor {
@@ -109,6 +110,11 @@ public class DepthFirstVisitor implements Visitor {
 
     @Override
     public void visit(IntegerType n) {
+        // No-op
+    }
+
+    @Override
+    public void visit(VoidType n) {
         // No-op
     }
 
