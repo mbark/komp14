@@ -100,7 +100,6 @@ Program Program(): {
     }
 }
 
-// FIXME: What to do with VarDeclList?
 MainClass MainClass(): {
     Token klass, main, args;
     VarDecl vd;
@@ -122,7 +121,7 @@ MainClass MainClass(): {
         {
             throw new ParseException();
         }
-        return new MainClass(new Identifier(klass), new Identifier(args), new Block(sl));
+        return new MainClass(new Identifier(klass), new Identifier(args), vdl, new Block(sl));
     }
 }
 

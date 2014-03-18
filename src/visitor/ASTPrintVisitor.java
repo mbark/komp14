@@ -69,6 +69,13 @@ public class ASTPrintVisitor implements Visitor {
         System.out.print(", ");
         n.i2.accept(this);
         System.out.print(", ");
+        for (int i = 0; i < n.vl.size(); i++) {
+            n.vl.elementAt(i).accept(this);
+            if (i + 1 < n.vl.size()) {
+                System.out.print(", ");
+            }
+        }
+        System.out.print(", ");
         n.s.accept(this);
         System.out.println(")");
     }

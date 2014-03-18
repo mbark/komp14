@@ -5,11 +5,13 @@ import visitor.Visitor;
 
 public class MainClass {
     public Identifier i1, i2;
+    public VarDeclList vl;
     public Statement s;
 
-    public MainClass(Identifier ai1, Identifier ai2, Statement as) {
+    public MainClass(Identifier ai1, Identifier ai2, VarDeclList avl, Statement as) {
         i1 = ai1;
         i2 = ai2;
+        vl = avl;
         s = as;
     }
 

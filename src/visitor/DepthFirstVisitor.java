@@ -60,6 +60,7 @@ public class DepthFirstVisitor implements Visitor {
     public void visit(MainClass n) {
         visit(n.i1);
         visit(n.i2);
+        visit(n.vl);
         visit(n.s);
     }
 
