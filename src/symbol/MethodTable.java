@@ -41,7 +41,7 @@ public class MethodTable {
     }
 
     public boolean putLocal(Symbol key, Type value) {
-        if (locals.containsKey(key)) {
+        if (params.containsKey(key) || locals.containsKey(key)) {
             return false;
         }
         locals.put(key, value);
