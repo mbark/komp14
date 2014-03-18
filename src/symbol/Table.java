@@ -1,71 +1,48 @@
 package symbol;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 
 public class Table {
-    private Deque<HashMap<Symbol, Object>> tables;
+    private HashMap<Symbol, Object> table;
 
     public Table() {
-        tables = new ArrayDeque<>();
+        table = new HashMap<>();
     }
 
-    public void put(Symbol key, Object value) {
-        HashMap<Symbol, Object> table = tables.peek();
+    public boolean put(Symbol key, Object value) {
+        if(table.containsKey(key)) {
+            return false;
+        }
+        
         table.put(key, value);
+        return true;
     }
 
     public Object get(Symbol key) {
-        for (HashMap<Symbol, Object> table : tables) {
-            Object o = table.get(key);
-            if (o != null) {
-                return o;
-            }
-        }
-
-        return null;
-    }
-
-    public void beginScope() {
-        tables.push(new HashMap<Symbol, Object>());
-    }
-
-    public void endScope() {
-        tables.pop();
+        return table.get(key);
     }
 
     public Enumeration<Symbol> keys() {
-        return new KeyEnumeration(tables);
+        return new KeyEnumeration(table);
     }
 
     public static final class KeyEnumeration implements Enumeration<Symbol> {
-        Iterator<HashMap<Symbol, Object>> tableIterator;
-        Iterator<Symbol> symbolIterator;
+        Iterator<Symbol> iterator;
 
-        private KeyEnumeration(Deque<HashMap<Symbol, Object>> tables) {
-            tableIterator = tables.iterator();
+        private KeyEnumeration(HashMap<Symbol, Object> table) {
+            iterator = table.keySet().iterator();
         }
 
         @Override
         public boolean hasMoreElements() {
-            if (symbolIterator == null || !symbolIterator.hasNext()) {
-                if (tableIterator.hasNext()) {
-                    HashMap<Symbol, Object> nextTable = tableIterator.next();
-                    symbolIterator = nextTable.keySet().iterator();
-                } else {
-                    return false;
-                }
-            }
-
-            return symbolIterator.hasNext();
+            return iterator.hasNext();
         }
 
         @Override
         public Symbol nextElement() {
-            return symbolIterator.next();
+            return iterator.next();
         }
 
     }
