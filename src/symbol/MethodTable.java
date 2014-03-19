@@ -35,32 +35,41 @@ public class MethodTable {
         if (containsParam(key)) {
             return false;
         }
-        
+
         params.add(param);
         return true;
     }
-    
+
     private static final class Param {
         Symbol key;
-        Type value;
+        Type type;
+
         private Param(Symbol key, Type value) {
             this.key = key;
-            this.value = value;
+            this.type = value;
         }
     }
 
     public Type getParam(Symbol key) {
-        for(Param param : params) {
-            if(param.key.equals(key)) {
-                return param.value;
+        for (Param param : params) {
+            if (param.key.equals(key)) {
+                return param.type;
             }
         }
         return null;
     }
-    
+
+    public Type getParam(int i) {
+        if (i >= 0 && i < params.size()) {
+            return params.get(i).type;
+        } else {
+            return null;
+        }
+    }
+
     private boolean containsParam(Symbol key) {
-        for(Param param : params) {
-            if(param.key.equals(key)) {
+        for (Param param : params) {
+            if (param.key.equals(key)) {
                 return true;
             }
         }
