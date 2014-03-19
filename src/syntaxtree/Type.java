@@ -16,4 +16,13 @@ public abstract class Type {
     public String toString() {
         return getClass().getName();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        return getClass().equals(obj.getClass());
+    }
+
 }
