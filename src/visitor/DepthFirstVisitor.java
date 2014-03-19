@@ -45,7 +45,7 @@ import syntaxtree.VarDeclList;
 import syntaxtree.VoidType;
 import syntaxtree.While;
 
-public class DepthFirstVisitor implements Visitor {
+public abstract class DepthFirstVisitor implements Visitor {
 
     @Override
     public void visit(Program n) {
