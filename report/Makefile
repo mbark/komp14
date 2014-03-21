@@ -4,7 +4,10 @@ LATEX?=xelatex
 
 default: pdf
 
-pdf: report.pdf
+pdf: ../report.pdf
+
+../report.pdf: report.pdf
+	@cp report.pdf ../
 
 report.pdf: report.tex
 	$(LATEX) report
