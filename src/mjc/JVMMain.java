@@ -1,6 +1,6 @@
 package mjc;
 
-import java.io.StringReader;
+import java.io.FileReader;
 
 import syntaxtree.Program;
 import visitor.TypeDefVisitor;
@@ -9,7 +9,8 @@ public class JVMMain {
 
     public static void main(String[] args) {
         try {
-            Program p = new Parser(new StringReader(args[0])).Program();
+            @SuppressWarnings("static-access")
+            Program p = new Parser(new FileReader(args[0])).Program();
             TypeDefVisitor stp = new TypeDefVisitor();
             stp.visit(p);
         } catch (Throwable e) {

@@ -2,9 +2,12 @@
 
 compdir=$(cd "$(dirname $0)/.."; pwd)
 scratch=$(mktemp tmp.XXXXXXXXXX)
+java_classpath=$compdir/mjc.jar:$compdir/lib/javacc.jar
+
+( cd $compdir; ant > /dev/null )
 
 for program in `find $compdir/testcases/compile -name '*.java'`; do
-    java -cp $compdir/bin mjc.JVMMain "$(cat $program)" > "$scratch"
+    java -cp $java_classpath mjc.JVMMain "$program" -S > "$scratch"
     if [ $? -gt 0 ]; then
         echo "ERROR: False negative for \"$program\""
         cat "$scratch"
@@ -12,7 +15,7 @@ for program in `find $compdir/testcases/compile -name '*.java'`; do
 done
 
 for program in `find $compdir/testcases/noncompile -name '*.java'`; do
-    java -cp $compdir/bin mjc.JVMMain "$(cat $program)" > "$scratch"
+    java -cp $java_classpath mjc.JVMMain "$program" -S > "$scratch"
     if [ $? -lt 1 ]; then
         echo "ERROR: False positive for \"$program\""
         cat "$scratch"
