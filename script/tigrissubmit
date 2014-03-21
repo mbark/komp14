@@ -5,7 +5,10 @@ set -o pipefail
 
 compdir=$(cd "$(dirname $0)/.."; pwd)
 
-( cd $compdir; ant clean > /dev/null )
+(
+    cd $compdir
+    ant clean > /dev/null
+)
 
 if [ -f $compdir/build.xml ] && \
     [ -f $compdir/DESC ] && \
@@ -29,6 +32,9 @@ else
     exit 1
 fi
 
-tar cf - $compdir --transform="s,${compdir:1},," | gzip | uuencode x | mailx -s '' submit@tigris.csc.kth.se
+(
+    cd $compdir
+    tar cf - * | gzip | uuencode x | mailx -s '' submit@tigris.csc.kth.se
+)
 
 exit 0
