@@ -29,4 +29,19 @@ public class IdentifierType extends Type {
     public Type accept(TypeVisitor v) {
         return v.visit(this);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        boolean isEqual = super.equals(obj);
+        if (isEqual) {
+            IdentifierType other = (IdentifierType) obj;
+            if (other.s != null) {
+                return other.s.equals(this.s);
+            } else {
+                return this.s == null;
+            }
+        }
+
+        return false;
+    }
 }
