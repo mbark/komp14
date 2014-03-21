@@ -5,6 +5,8 @@ set -o pipefail
 
 compdir=$(cd "$(dirname $0)/.."; pwd)
 
+( cd $compdir; ant clean > /dev/null )
+
 if [ -f $compdir/build.xml ] && \
     [ -f $compdir/DESC ] && \
     [ -d $compdir/src ] && \
