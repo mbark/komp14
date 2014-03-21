@@ -1,10 +1,10 @@
-class Main {
+class Double {
     public static void main(String[] args) {
 
     }
 }
 
-class Main {
+class Double {
 	public int foo() {
 		return 1;
 	}

@@ -2,8 +2,10 @@ class Main {
     public static void main(String[] args) {
 
     }
+}
 
-    public int foo() {
+class Foo {
+	public int foo() {
     	return 1;
     }
 

@@ -7,5 +7,5 @@ class Main {
 
 class OtherClass {
 	int i;
-	String s;
+	OtherClass s;
 }
