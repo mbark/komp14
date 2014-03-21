@@ -1,9 +1,12 @@
+/**
+ * Test case intended to exercise all grammar constructs.
+ */
 class Main {
     public static void main(String[] args) {
         Aux aux;
         int[] a;
         aux = new Aux();
-        a = new int[10];
+        a = new int[10]; // not used
         aux = aux.doTheThing(a);
         System.out.println(0);
     }
@@ -12,6 +15,7 @@ class Main {
 class Aux {
     boolean foo;
 
+    // Nonsense method
     public Aux doTheThing(int[] arr)
     {
         int i;
