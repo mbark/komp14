@@ -28,8 +28,8 @@ else
 fi
 
 (
-    cd $compdir
-    tar cf - $(git ls-files) | gzip | uuencode x | mailx -s '' submit@tigris.csc.kth.se
+    cd $compdir/..
+    tar cf - $(basename "$compdir") | gzip | uuencode x | mailx -s '' submit@tigris.csc.kth.se
 )
 
 exit 0
