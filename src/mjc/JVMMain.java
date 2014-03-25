@@ -9,6 +9,7 @@ import java.util.List;
 import symbol.ProgramTable;
 import syntaxtree.Program;
 import syntaxtree.SyntaxTreePrinter;
+import visitor.TypeCheckVisitor;
 import visitor.TypeDefVisitor;
 import error.ErrorMsg;
 
@@ -82,14 +83,21 @@ public class JVMMain {
                 stp.visit(p);
             }
 
-            // Type check
+            // Type check: define types
             ErrorMsg err = new ErrorMsg(System.err);
             TypeDefVisitor tdv = new TypeDefVisitor(err);
             tdv.visit(p);
             if (err.hasAnyErrors()) {
                 System.exit(1);
             }
+
+            // Type check: check types
             ProgramTable pt = tdv.getProgramTable();
+            TypeCheckVisitor tcv = new TypeCheckVisitor(pt, err);
+            tcv.visit(p);
+            if (err.hasAnyErrors()) {
+                System.exit(1);
+            }
 
             // Print symbol table
             if (options.printSymbolTable) {

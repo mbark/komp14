@@ -49,8 +49,8 @@ public class TypeCheckVisitor implements TypeVisitor {
     private MethodTable currMethod;
     private ErrorMsg error;
 
-    public TypeCheckVisitor(ProgramTable programTable) {
-        error = new ErrorMsg(System.err);
+    public TypeCheckVisitor(ProgramTable programTable, ErrorMsg error) {
+        this.error = error;
         currProgram = programTable;
     }
 
@@ -70,31 +70,59 @@ public class TypeCheckVisitor implements TypeVisitor {
         return type;
     }
 
-    private Type getReturnTypeOfMethod(Symbol method) {
-        if (currClass != null) {
-            MethodTable table = currClass.getMethod(method);
-            return table.getReturnType();
+    private String getContext() {
+        if (currClass == null) {
+            return "no class";
+        } else if (currMethod == null) {
+            return "class " + currClass.getId();
+        } else {
+            return "class " + currClass.getId() + " and method "
+                    + currMethod.getId();
         }
-
-        return null;
     }
 
     @Override
     public Type visit(Program n) {
-        // TODO: fix
-        return null;
+        n.m.accept(this);
+        for (int i = 0; i < n.cl.size(); i++) {
+            n.cl.elementAt(i).accept(this);
+        }
+
+        // TODO: other type?
+        return new VoidType();
     }
 
     @Override
     public Type visit(MainClass n) {
-        // TODO: fix
-        return null;
+        currClass = currProgram.get(convertToSymbol(n.i1));
+        currMethod = currClass.getMethod(Symbol.symbol("main"));
+
+        n.s.accept(this);
+        for (int i = 0; i < n.vl.size(); i++) {
+            n.vl.elementAt(i).accept(this);
+        }
+
+        currMethod = null;
+        currClass = null;
+        // TODO: other type?
+        return new VoidType();
     }
 
     @Override
     public Type visit(ClassDeclSimple n) {
-        // TODO: fix
-        return null;
+        currClass = currProgram.get(convertToSymbol(n.i));
+
+        for (int i = 0; i < n.vl.size(); i++) {
+            n.vl.elementAt(i).accept(this);
+        }
+
+        for (int i = 0; i < n.ml.size(); i++) {
+            n.ml.elementAt(i).accept(this);
+        }
+
+        currClass = null;
+        // TODO: other type?
+        return new VoidType();
     }
 
     @Override
@@ -105,14 +133,36 @@ public class TypeCheckVisitor implements TypeVisitor {
 
     @Override
     public Type visit(VarDecl n) {
-        // TODO: fix
-        return null;
+        return n.t;
     }
 
     @Override
     public Type visit(MethodDecl n) {
-        // TODO: fix
-        return null;
+        currMethod = currClass.getMethod(convertToSymbol(n.i));
+
+        if (currClass == null) {
+            error.complain("No method with name " + n.i + " for class "
+                    + currClass.getId());
+            // TODO: other type?
+            return new VoidType();
+        }
+
+        for (int i = 0; i < n.fl.size(); i++) {
+            n.fl.elementAt(i).accept(this);
+        }
+
+        for (int i = 0; i < n.vl.size(); i++) {
+            n.vl.elementAt(i).accept(this);
+        }
+
+        for (int i = 0; i < n.sl.size(); i++) {
+            n.sl.elementAt(i).accept(this);
+        }
+
+        n.e.accept(this);
+
+        currMethod = null;
+        return new VoidType();
     }
 
     @Override
@@ -181,7 +231,13 @@ public class TypeCheckVisitor implements TypeVisitor {
     @Override
     public Type visit(Assign n) {
         final Type leftType = getTypeOfVariable(convertToSymbol(n.i));
+        if (leftType == null) {
+            error.complain("Variable " + n.i + " in " + getContext()
+                    + " has no type declared");
+            return new VoidType();
+        }
         final Type rightType = n.e.accept(this);
+
         if (!leftType.equals(rightType)) {
             error.complain("Expression must be of same type as var");
         }
@@ -190,8 +246,11 @@ public class TypeCheckVisitor implements TypeVisitor {
 
     @Override
     public Type visit(ArrayAssign n) {
-        if (!(getTypeOfVariable(convertToSymbol(n.i)) instanceof IntArrayType)) {
-            error.complain("Variable in ArrayAssign must be of type integer array");
+        Type t = getTypeOfVariable(convertToSymbol(n.i));
+        if (!(t instanceof IntArrayType)) {
+            error.complain("Variable in ArrayAssign must be of type "
+                    + IntArrayType.class.getSimpleName() + " but is of type "
+                    + t);
         }
         if (!(n.e1.accept(this) instanceof IntegerType)) {
             error.complain("Index in ArrayAssign must be of type integer");
@@ -199,6 +258,7 @@ public class TypeCheckVisitor implements TypeVisitor {
         if (!(n.e2.accept(this) instanceof IntegerType)) {
             error.complain("Value of ArrayAssign must be of type integer");
         }
+
         return new VoidType();
     }
 
@@ -269,8 +329,9 @@ public class TypeCheckVisitor implements TypeVisitor {
 
     @Override
     public Type visit(ArrayLookup n) {
-        if (!(n.e1.accept(this) instanceof IntArrayType)) {
-            error.complain("Variable in ArrayLookup must be of type integer array");
+        Type t = n.e1.accept(this);
+        if (!(t instanceof IntArrayType)) {
+            complainAboutIcorrectVariableTypes(n, IntArrayType.class, t);
         }
         if (!(n.e2.accept(this) instanceof IntegerType)) {
             error.complain("Index of ArrayLookup must be of type integer");
@@ -281,7 +342,7 @@ public class TypeCheckVisitor implements TypeVisitor {
     @Override
     public Type visit(ArrayLength n) {
         if (!(n.e.accept(this) instanceof IntArrayType)) {
-            error.complain("Variable in ArrayLookup must be of type integer array");
+            error.complain("Variable in ArrayLength must be of type integer array");
         }
         return new IntegerType();
     }
@@ -293,6 +354,9 @@ public class TypeCheckVisitor implements TypeVisitor {
         if (!(expType instanceof IdentifierType)) {
             error.complain("Variable in Call must be of type identifier type");
         }
+
+        Type t = getTypeOfVariable(Symbol.symbol("aux"));
+        System.err.println("Type of variable " + t);
 
         // Ensure indentifier type is defined (as a class)
         IdentifierType idType = (IdentifierType) expType;
@@ -343,8 +407,7 @@ public class TypeCheckVisitor implements TypeVisitor {
 
     @Override
     public Type visit(IdentifierExp n) {
-        // TODO: fix
-        return null;
+        return new IdentifierType(n.s);
     }
 
     @Override
@@ -384,6 +447,15 @@ public class TypeCheckVisitor implements TypeVisitor {
                     + " must be of type boolean");
         }
         return new BooleanType();
+    }
+
+    private void complainAboutIcorrectVariableTypes(Object declarationType,
+            Class<? extends Type> expected, Type actual) {
+        String errorMsg = "Variable "
+                + declarationType.getClass().getSimpleName();
+        errorMsg += " has expected type " + expected.getSimpleName();
+        errorMsg += " but has actual type " + actual.getClass().getSimpleName();
+        error.complain(errorMsg);
     }
 
     @Override
