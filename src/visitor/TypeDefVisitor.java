@@ -23,23 +23,21 @@ public class TypeDefVisitor extends AbstractTypeDefVisitor {
     private ClassTable currClass;
     private ErrorMsg error;
 
-    public TypeDefVisitor() {
+    public TypeDefVisitor(ErrorMsg error) {
         currProgram = null;
         currMethod = null;
         currClass = null;
-        error = new ErrorMsg(System.err);
+        this.error = error;
+    }
+
+    public ProgramTable getProgramTable() {
+        return currProgram;
     }
 
     @Override
     public void visit(Program n) {
         currProgram = new ProgramTable();
         super.visit(n);
-
-        if (!error.hasAnyErrors()) {
-            System.out.println(currProgram);
-        } else {
-            System.exit(1);
-        }
     }
 
     @Override
