@@ -242,7 +242,8 @@ public class SyntaxTreePrinter extends visitor.DepthFirstVisitor {
 
     void preWork(Identifier n) {
         String name = nodeName(n);
-        out.println(indent() + "(" + name + "[ " + n.s + " ]");
+        out.println(indent() + "(" + name + "[ " + n.s + " " + n.sourceLocation
+                + " ]");
         ++level;
     }
 
