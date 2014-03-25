@@ -1,0 +1,6 @@
+#!/bin/bash
+
+compdir=$(cd "$(dirname $0)/.."; pwd)
+java_classpath=$compdir/mjc.jar:$compdir/lib/javacc.jar
+
+java -cp $java_classpath mjc.JVMMain $@
