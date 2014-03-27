@@ -159,7 +159,12 @@ public class TypeCheckVisitor implements TypeVisitor {
             n.sl.elementAt(i).accept(this);
         }
 
-        n.e.accept(this);
+        Type returnType = n.e.accept(this);
+        
+        if(!returnType.equals(currMethod.getReturnType())) {
+            error.complain("Invalid return type for method " + currMethod.getId() + ", expected: " + currMethod.getReturnType() + " actual: " + returnType);
+        }
+        
 
         currMethod = null;
         return new VoidType();
