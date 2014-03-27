@@ -230,7 +230,10 @@ public class TypeCheckVisitor implements TypeVisitor {
 
     @Override
     public Type visit(Print n) {
-        n.e.accept(this);
+        Type t = n.e.accept(this);
+        if(t instanceof IntArrayType || t instanceof IdentifierType) {
+            error.complain("Invalid type used for print " + t);
+        }
         return new VoidType();
     }
 
