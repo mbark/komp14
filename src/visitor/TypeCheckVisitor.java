@@ -160,11 +160,12 @@ public class TypeCheckVisitor implements TypeVisitor {
         }
 
         Type returnType = n.e.accept(this);
-        
-        if(!returnType.equals(currMethod.getReturnType())) {
-            error.complain("Invalid return type for method " + currMethod.getId() + ", expected: " + currMethod.getReturnType() + " actual: " + returnType);
+
+        if (!returnType.equals(currMethod.getReturnType())) {
+            error.complain("Invalid return type for method "
+                    + currMethod.getId() + ", expected: "
+                    + currMethod.getReturnType() + " actual: " + returnType);
         }
-        
 
         currMethod = null;
         return new VoidType();
@@ -244,7 +245,8 @@ public class TypeCheckVisitor implements TypeVisitor {
         final Type rightType = n.e.accept(this);
 
         if (!leftType.equals(rightType)) {
-            error.complain("Expression must be of same type as var");
+            error.complain("Expression must be of same type as var, expected: "
+                    + leftType + " actual: " + rightType);
         }
         return new VoidType();
     }
@@ -341,6 +343,7 @@ public class TypeCheckVisitor implements TypeVisitor {
         if (!(n.e2.accept(this) instanceof IntegerType)) {
             error.complain("Index of ArrayLookup must be of type integer");
         }
+
         return new IntegerType();
     }
 
