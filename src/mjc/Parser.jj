@@ -402,7 +402,7 @@ Exp ExpTerminator(): {
             (
                 <LBRACKET>
                 {
-                    throw new ParseException("INVALID!");
+                    throw new ParseException("Multidimensional arrays are not supported!");
                 }
             |
                 {}
