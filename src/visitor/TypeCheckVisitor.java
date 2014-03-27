@@ -340,6 +340,7 @@ public class TypeCheckVisitor implements TypeVisitor {
         if (!(t instanceof IntArrayType)) {
             complainAboutIcorrectVariableTypes(n, IntArrayType.class, t);
         }
+
         if (!(n.e2.accept(this) instanceof IntegerType)) {
             error.complain("Index of ArrayLookup must be of type integer");
         }
