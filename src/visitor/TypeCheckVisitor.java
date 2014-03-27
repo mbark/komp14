@@ -335,9 +335,6 @@ public class TypeCheckVisitor implements TypeVisitor {
     @Override
     public Type visit(ArrayLookup n) {
         Type t = n.e1.accept(this);
-        if (n.e1 instanceof NewArray) {
-            error.complain("Cannot lookup element of just created array");
-        }
         if (!(t instanceof IntArrayType)) {
             complainAboutIcorrectVariableTypes(n, IntArrayType.class, t);
         }
