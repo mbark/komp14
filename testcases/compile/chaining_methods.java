@@ -1,12 +1,13 @@
 class Main {
     public static void main(String[] args) {
-    	Main m;
-    	m = m.getMain().getMain();
+    	Other o;
+    	o = o.getOther();
+    	o = o.getOther().getOther();
     }
 }
 
 class Other {
-    public Main getMain() {
-    	return new Main();
+    public Other getOther() {
+    	return new Other();
     }
 }

@@ -355,10 +355,7 @@ public class TypeCheckVisitor implements TypeVisitor {
             error.complain("Variable in Call must be of type identifier type");
         }
 
-        Type t = getTypeOfVariable(Symbol.symbol("aux"));
-        System.err.println("Type of variable " + t);
-
-        // Ensure indentifier type is defined (as a class)
+        // Ensure the type is defined (as a class)
         IdentifierType idType = (IdentifierType) expType;
         Type returnType = new VoidType(); // TODO: change this?
         ClassTable ct = currProgram.get(Symbol.symbol(idType.s));
@@ -407,7 +404,7 @@ public class TypeCheckVisitor implements TypeVisitor {
 
     @Override
     public Type visit(IdentifierExp n) {
-        return new IdentifierType(n.s);
+        return getTypeOfVariable(Symbol.symbol(n.s));
     }
 
     @Override

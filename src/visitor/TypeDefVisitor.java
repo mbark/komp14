@@ -8,6 +8,7 @@ import syntaxtree.ClassDeclExtends;
 import syntaxtree.ClassDeclSimple;
 import syntaxtree.Formal;
 import syntaxtree.Identifier;
+import syntaxtree.IdentifierType;
 import syntaxtree.MainClass;
 import syntaxtree.MethodDecl;
 import syntaxtree.Program;
@@ -73,7 +74,6 @@ public class TypeDefVisitor extends AbstractTypeDefVisitor {
         Symbol id = convertToSymbol(n.i);
         if (currMethod == null) {
             addFieldToClass(id, t);
-
         } else {
             addLocalToMethod(id, t);
         }

@@ -44,4 +44,9 @@ public class IdentifierType extends Type {
 
         return false;
     }
+    
+    @Override
+    public String toString() {
+        return this.getClass().getName() + "(" + this.s + ")";
+    }
 }
