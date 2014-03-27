@@ -1,8 +1,10 @@
 package mjc;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,13 +41,13 @@ public class JVMMain {
     }
 
     public static void main(String[] args) {
-        List<String> sourceFiles = new LinkedList<String>();
+        List<File> sourceFiles = new LinkedList<File>();
         Options options = new Options();
 
         // Parse arguments
         for (int i = 0; i < args.length; i++) {
             if (!args[i].startsWith("-")) {
-                sourceFiles.add(args[i]);
+                sourceFiles.add(new File(args[i]));
             } else {
                 boolean success = options.parseOption(args[i]);
                 if (!success) {
@@ -61,7 +63,7 @@ public class JVMMain {
             System.exit(1);
         }
 
-        for (String sourceFile : sourceFiles) {
+        for (File sourceFile : sourceFiles) {
             // Parse
             Program p = null;
             try {
@@ -106,7 +108,16 @@ public class JVMMain {
 
             // Generate assembly
             if (options.generateAssemblyCode) {
-                // TODO: implement this
+                File assemblyFile = new File("./"
+                        + sourceFile.getName().replace(".java", ".s"));
+                try {
+                    PrintWriter pw = new PrintWriter(assemblyFile);
+                    // TODO: write assembly code
+                    pw.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace(System.err);
+                    System.exit(1);
+                }
             }
         }
     }

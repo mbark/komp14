@@ -4,6 +4,7 @@
 *.jar
 *.log
 *.out
+*.s
 *.pdf
 *.war
 DESC
