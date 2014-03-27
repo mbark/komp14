@@ -399,6 +399,14 @@ Exp ExpTerminator(): {
         <NEW>
         (
             <INT> <LBRACKET> e2 = Exp() <RBRACKET>
+            (
+                <LBRACKET>
+                {
+                    throw new ParseException("INVALID!");
+                }
+            |
+                {}
+            )
             {
                 e1 = new NewArray(e2);
             }
