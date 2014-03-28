@@ -12,6 +12,9 @@
     <target name="clean">
         <delete dir="bin"/>
         <delete file="mjc.jar"/>
+        <delete>
+            <fileset dir="." includes="*.s" />
+        </delete>
     </target>
     <target depends="clean" name="cleanall"/>
     <target depends="init" name="build">
