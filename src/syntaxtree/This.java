@@ -1,6 +1,6 @@
 package syntaxtree;
 
-import tree.Stm;
+import tree.AbstractExp;
 import visitor.TreeVisitor;
 import visitor.TypeVisitor;
 import visitor.Visitor;
@@ -14,7 +14,7 @@ public class This extends Exp {
         return v.visit(this);
     }
 
-    public Stm accept(TreeVisitor v) {
+    public AbstractExp accept(TreeVisitor v) {
         return v.visit(this);
     }
 }

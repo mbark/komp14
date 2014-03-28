@@ -35,6 +35,7 @@ import syntaxtree.True;
 import syntaxtree.VarDecl;
 import syntaxtree.VoidType;
 import syntaxtree.While;
+import tree.AbstractExp;
 import tree.Stm;
 
 public interface TreeVisitor {
@@ -72,18 +73,18 @@ public interface TreeVisitor {
 
     // Stm t;
     // Identifier i;
-    public Stm visit(Formal n);
+    public AbstractExp visit(Formal n);
 
-    public Stm visit(IntArrayType n);
+    public AbstractExp visit(IntArrayType n);
 
-    public Stm visit(BooleanType n);
+    public AbstractExp visit(BooleanType n);
 
-    public Stm visit(IntegerType n);
+    public AbstractExp visit(IntegerType n);
 
-    public Stm visit(VoidType n);
+    public AbstractExp visit(VoidType n);
 
     // String s;
-    public Stm visit(IdentifierType n);
+    public AbstractExp visit(IdentifierType n);
 
     // StatementList sl;
     public Stm visit(Block n);
@@ -108,52 +109,52 @@ public interface TreeVisitor {
     public Stm visit(ArrayAssign n);
 
     // Exp e1,e2;
-    public Stm visit(And n);
+    public AbstractExp visit(And n);
 
     // Exp e1,e2;
-    public Stm visit(LessThan n);
+    public AbstractExp visit(LessThan n);
 
     // Exp e1,e2;
-    public Stm visit(Plus n);
+    public AbstractExp visit(Plus n);
 
     // Exp e1,e2;
-    public Stm visit(Minus n);
+    public AbstractExp visit(Minus n);
 
     // Exp e1,e2;
-    public Stm visit(Times n);
+    public AbstractExp visit(Times n);
 
     // Exp e1,e2;
-    public Stm visit(ArrayLookup n);
+    public AbstractExp visit(ArrayLookup n);
 
     // Exp e;
-    public Stm visit(ArrayLength n);
+    public AbstractExp visit(ArrayLength n);
 
     // Exp e;
     // Identifier i;
     // ExpList el;
-    public Stm visit(Call n);
+    public AbstractExp visit(Call n);
 
     // int i;
-    public Stm visit(IntegerLiteral n);
+    public AbstractExp visit(IntegerLiteral n);
 
-    public Stm visit(True n);
+    public AbstractExp visit(True n);
 
-    public Stm visit(False n);
+    public AbstractExp visit(False n);
 
     // String s;
-    public Stm visit(IdentifierExp n);
+    public AbstractExp visit(IdentifierExp n);
 
-    public Stm visit(This n);
+    public AbstractExp visit(This n);
 
     // Exp e;
-    public Stm visit(NewArray n);
+    public AbstractExp visit(NewArray n);
 
     // Identifier i;
-    public Stm visit(NewObject n);
+    public AbstractExp visit(NewObject n);
 
     // Exp e;
-    public Stm visit(Not n);
+    public AbstractExp visit(Not n);
 
     // String s;
-    public Stm visit(Identifier n);
+    public AbstractExp visit(Identifier n);
 }
