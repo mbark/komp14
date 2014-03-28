@@ -8,7 +8,6 @@ import syntaxtree.ClassDeclExtends;
 import syntaxtree.ClassDeclSimple;
 import syntaxtree.Formal;
 import syntaxtree.Identifier;
-import syntaxtree.IdentifierType;
 import syntaxtree.MainClass;
 import syntaxtree.MethodDecl;
 import syntaxtree.Program;
@@ -45,8 +44,7 @@ public class TypeDefVisitor extends AbstractTypeDefVisitor {
     public void visit(MainClass n) {
         currClass = new ClassTable(convertToSymbol(n.i1));
         currMethod = new MethodTable(Symbol.symbol("main"), new VoidType());
-        // FIXME: String?
-        addParamToMethod(convertToSymbol(n.i2), new VoidType());
+//        We can ignore the String[] args param, its use is undefined
 
         super.visit(n);
 
