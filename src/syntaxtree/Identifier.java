@@ -2,6 +2,8 @@ package syntaxtree;
 
 import mjc.SourceLocation;
 import mjc.Token;
+import tree.Stm;
+import visitor.TreeVisitor;
 import visitor.TypeVisitor;
 import visitor.Visitor;
 
@@ -27,7 +29,12 @@ public class Identifier {
         return v.visit(this);
     }
 
+    public Stm accept(TreeVisitor v) {
+        return v.visit(this);
+    }
+
     public String toString() {
         return s;
     }
+
 }

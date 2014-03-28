@@ -1,5 +1,7 @@
 package syntaxtree;
 
+import tree.Stm;
+import visitor.TreeVisitor;
 import visitor.TypeVisitor;
 import visitor.Visitor;
 
@@ -8,7 +10,8 @@ public class MainClass {
     public VarDeclList vl;
     public Statement s;
 
-    public MainClass(Identifier ai1, Identifier ai2, VarDeclList avl, Statement as) {
+    public MainClass(Identifier ai1, Identifier ai2, VarDeclList avl,
+            Statement as) {
         i1 = ai1;
         i2 = ai2;
         vl = avl;
@@ -20,6 +23,10 @@ public class MainClass {
     }
 
     public Type accept(TypeVisitor v) {
+        return v.visit(this);
+    }
+
+    public Stm accept(TreeVisitor v) {
         return v.visit(this);
     }
 }

@@ -1,5 +1,7 @@
 package syntaxtree;
 
+import tree.Stm;
+import visitor.TreeVisitor;
 import visitor.TypeVisitor;
 import visitor.Visitor;
 
@@ -15,6 +17,10 @@ public class NewObject extends Exp {
     }
 
     public Type accept(TypeVisitor v) {
+        return v.visit(this);
+    }
+
+    public Stm accept(TreeVisitor v) {
         return v.visit(this);
     }
 }

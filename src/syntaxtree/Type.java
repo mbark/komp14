@@ -1,5 +1,7 @@
 package syntaxtree;
 
+import tree.Stm;
+import visitor.TreeVisitor;
 import visitor.TypeVisitor;
 import visitor.Visitor;
 
@@ -11,6 +13,8 @@ public abstract class Type {
     public abstract void accept(Visitor v);
 
     public abstract Type accept(TypeVisitor v);
+
+    public abstract Stm accept(TreeVisitor v);
 
     @Override
     public String toString() {

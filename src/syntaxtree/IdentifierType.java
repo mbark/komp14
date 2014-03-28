@@ -1,6 +1,8 @@
 package syntaxtree;
 
 import mjc.Token;
+import tree.Stm;
+import visitor.TreeVisitor;
 import visitor.TypeVisitor;
 import visitor.Visitor;
 
@@ -30,6 +32,10 @@ public class IdentifierType extends Type {
         return v.visit(this);
     }
 
+    public Stm accept(TreeVisitor v) {
+        return v.visit(this);
+    }
+
     @Override
     public boolean equals(Object obj) {
         boolean isEqual = super.equals(obj);
@@ -44,7 +50,7 @@ public class IdentifierType extends Type {
 
         return false;
     }
-    
+
     @Override
     public String toString() {
         return this.getClass().getName() + "(" + this.s + ")";
