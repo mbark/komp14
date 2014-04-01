@@ -1,5 +1,7 @@
 package visitor;
 
+import java.util.HashMap;
+
 import symbol.ClassTable;
 import symbol.MethodTable;
 import symbol.ProgramTable;
@@ -41,21 +43,31 @@ import syntaxtree.VoidType;
 import syntaxtree.While;
 import temp.Label;
 import tree.AbstractExp;
+import tree.BINOP;
 import tree.CALL;
+import tree.CJUMP;
+import tree.CONST;
 import tree.ExpList;
-import tree.LABEL;
+import tree.NAME;
 import tree.Stm;
+import tree.TEMP;
 
 public class TreeBuilderVisitor implements TreeVisitor {
 
     private ProgramTable currProgram;
     private ClassTable currClass;
     private MethodTable currMethod;
+    
+    private HashMap<AbstractExp, ClassTable> classesForExp;
+    private HashMap<Label, Stm> stmForLabel;
 
     public TreeBuilderVisitor(ProgramTable programTable) {
         currProgram = programTable;
         currClass = null;
         currMethod = null;
+        
+        classesForExp = new HashMap<>();
+        stmForLabel = new HashMap<>();
     }
 
     @Override
@@ -68,7 +80,9 @@ public class TreeBuilderVisitor implements TreeVisitor {
     public Stm visit(MainClass n) {
         currClass = currProgram.get(convertToSymbol(n.i1));
         currMethod = currClass.getMethod(Symbol.symbol("main"));
-        // TODO Auto-generated method stub
+        
+//      TODO: finish method
+        
         currMethod = null;
         currClass = null;
         return null;
@@ -77,7 +91,9 @@ public class TreeBuilderVisitor implements TreeVisitor {
     @Override
     public Stm visit(ClassDeclSimple n) {
         currClass = currProgram.get(convertToSymbol(n.i));
-        // TODO Auto-generated method stub
+        
+//        TODO: finish method
+        
         currClass = null;
         return null;
     }
@@ -146,8 +162,18 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
     @Override
     public Stm visit(If n) {
-        // TODO Auto-generated method stub
-        return null;
+        AbstractExp exp = n.e.accept(this);
+        
+        Stm stmt1 = n.s1.accept(this);
+        Stm stmt2 = n.s2.accept(this);
+
+        Label l1 = new Label();
+        Label l2 = new Label();
+        
+        stmForLabel.put(l1, stmt1);
+        stmForLabel.put(l2, stmt2);
+        
+        return new CJUMP(CJUMP.EQ, exp, new CONST(1), l1, l2);
     }
 
     @Override
@@ -176,32 +202,43 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
     @Override
     public AbstractExp visit(And n) {
-        // TODO Auto-generated method stub
-        return null;
+        AbstractExp left = n.e1.accept(this);
+        AbstractExp right = n.e2.accept(this);
+        
+        return new BINOP(BINOP.AND, left, right);
     }
 
     @Override
     public AbstractExp visit(LessThan n) {
-        // TODO Auto-generated method stub
+        AbstractExp left = n.e1.accept(this);
+        AbstractExp right = n.e2.accept(this);
+        
+//      TODO: implement
         return null;
     }
 
     @Override
     public AbstractExp visit(Plus n) {
-        // TODO Auto-generated method stub
-        return null;
+        AbstractExp left = n.e1.accept(this);
+        AbstractExp right = n.e2.accept(this);
+        
+        return new BINOP(BINOP.PLUS, left, right);
     }
 
     @Override
     public AbstractExp visit(Minus n) {
-        // TODO Auto-generated method stub
-        return null;
+        AbstractExp left = n.e1.accept(this);
+        AbstractExp right = n.e2.accept(this);
+        
+        return new BINOP(BINOP.MINUS, left, right);
     }
 
     @Override
     public AbstractExp visit(Times n) {
-        // TODO Auto-generated method stub
-        return null;
+        AbstractExp left = n.e1.accept(this);
+        AbstractExp right = n.e2.accept(this);
+        
+        return new BINOP(BINOP.MUL, left, right);
     }
 
     @Override
@@ -219,27 +256,27 @@ public class TreeBuilderVisitor implements TreeVisitor {
     @Override
     public AbstractExp visit(Call n) {
         AbstractExp callee = n.e.accept(this);
-        Label l = new Label(n.i.s);
-        AbstractExp ae = null;
-        return new CALL(ae, visit(n.el));
+        ClassTable klass = classesForExp.get(callee);
+        
+        String methodName = getMethodName(klass, n.i);
+        Label methodLabel = new Label(methodName);
+        
+        return new CALL(new NAME(methodLabel), visit(n.el));
     }
 
     @Override
     public AbstractExp visit(IntegerLiteral n) {
-        // TODO Auto-generated method stub
-        return null;
+        return new CONST(n.i);
     }
 
     @Override
     public AbstractExp visit(True n) {
-        // TODO Auto-generated method stub
-        return null;
+        return new CONST(1);
     }
 
     @Override
     public AbstractExp visit(False n) {
-        // TODO Auto-generated method stub
-        return null;
+        return new CONST(0);
     }
 
     @Override
@@ -300,5 +337,8 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
         return telHead;
     }
-
+    
+    private String getMethodName(ClassTable klass, Identifier method) {
+        return klass.getId().toString() + "_" + method.s;
+    }
 }
