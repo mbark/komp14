@@ -5,17 +5,17 @@ import java.io.PrintStream;
 import temp.DefaultMap;
 import temp.TempMap;
 
-public class Print {
+public class TreePrinter {
 
     PrintStream out;
     TempMap tmap;
 
-    public Print(PrintStream o, TempMap t) {
+    public TreePrinter(PrintStream o, TempMap t) {
         out = o;
         tmap = t;
     }
 
-    public Print(PrintStream o) {
+    public TreePrinter(PrintStream o) {
         out = o;
         tmap = new DefaultMap();
     }

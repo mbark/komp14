@@ -11,8 +11,8 @@ import java.util.List;
 import symbol.ProgramTable;
 import syntaxtree.Program;
 import syntaxtree.SyntaxTreePrinter;
-import tree.Print;
 import tree.Stm;
+import tree.TreePrinter;
 import visitor.TreeBuilderVisitor;
 import visitor.TypeCheckVisitor;
 import visitor.TypeDefVisitor;
@@ -24,6 +24,7 @@ public class JVMMain {
         public boolean generateAssemblyCode = false;
         public boolean printSyntaxTree = false;
         public boolean printSymbolTable = false;
+        public boolean printIntermediateRepresentation = false;
 
         public boolean parseOption(String option) {
             switch (option) {
@@ -35,6 +36,9 @@ public class JVMMain {
                 break;
             case "-sym":
                 printSymbolTable = true;
+                break;
+            case "-ir":
+                printIntermediateRepresentation = true;
                 break;
             default:
                 return false;
@@ -109,10 +113,14 @@ public class JVMMain {
                 System.err.println(pt);
             }
 
+            // Build IR
             TreeBuilderVisitor treeBuilder = new TreeBuilderVisitor(pt);
             Stm stm = treeBuilder.visit(p);
-            Print print = new Print(System.out);
-            print.prStm(stm);
+
+            // Print IR
+            if (options.printIntermediateRepresentation) {
+                new TreePrinter(System.err).prStm(stm);
+            }
 
             // Generate assembly
             if (options.generateAssemblyCode) {
