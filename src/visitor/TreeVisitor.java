@@ -61,7 +61,7 @@ public interface TreeVisitor {
 
     // Stm t;
     // Identifier i;
-    public Stm visit(VarDecl n);
+    public AbstractExp visit(VarDecl n);
 
     // Stm t;
     // Identifier i;

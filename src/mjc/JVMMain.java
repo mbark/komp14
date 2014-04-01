@@ -11,6 +11,9 @@ import java.util.List;
 import symbol.ProgramTable;
 import syntaxtree.Program;
 import syntaxtree.SyntaxTreePrinter;
+import tree.Print;
+import tree.Stm;
+import visitor.TreeBuilderVisitor;
 import visitor.TypeCheckVisitor;
 import visitor.TypeDefVisitor;
 import error.ErrorMsg;
@@ -105,6 +108,11 @@ public class JVMMain {
             if (options.printSymbolTable) {
                 System.err.println(pt);
             }
+
+            TreeBuilderVisitor treeBuilder = new TreeBuilderVisitor(pt);
+            Stm stm = treeBuilder.visit(p);
+            Print print = new Print(System.out);
+            print.prStm(stm);
 
             // Generate assembly
             if (options.generateAssemblyCode) {

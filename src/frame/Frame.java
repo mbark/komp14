@@ -32,7 +32,7 @@ public interface Frame {
 
     /**
      * Returns a list of Access objects, one for each formal parameter. The
-     * first Access object correspons to the first formal etc.
+     * first Access object corresponds to the first formal etc.
      * 
      * @return A List of Access objects.
      */

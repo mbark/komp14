@@ -136,7 +136,7 @@ public class Print {
         } else if (s instanceof EXP) {
             prStm((EXP) s, d);
         } else {
-            throw new Error("Print.prStm");
+//            throw new Error("Print.prStm " + " for " + s + " with d = " + d);
         }
     }
 
@@ -246,7 +246,7 @@ public class Print {
         } else if (e instanceof CALL) {
             prExp((CALL) e, d);
         } else {
-            throw new Error("Print.prExp");
+//            throw new Error("Print.prExp " + " for " + e + " with d = " + d);
         }
     }
 
