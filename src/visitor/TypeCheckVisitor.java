@@ -231,7 +231,7 @@ public class TypeCheckVisitor implements TypeVisitor {
     @Override
     public Type visit(Print n) {
         Type t = n.e.accept(this);
-        if(t instanceof IntArrayType || t instanceof IdentifierType) {
+        if (t instanceof IntArrayType || t instanceof IdentifierType) {
             error.complain("Invalid type used for print " + t);
         }
         return new VoidType();
@@ -383,6 +383,13 @@ public class TypeCheckVisitor implements TypeVisitor {
             } else {
                 returnType = mt.getReturnType();
 
+                // Ensure there are equally many parameters
+                if (n.el.size() != mt.getNrOfParams()) {
+                    error.complain("Call to method " + n.i + " expected "
+                            + mt.getNrOfParams() + " params, but got "
+                            + n.el.size());
+                }
+
                 // Ensure parameters have the correct type
                 for (int i = 0; i < n.el.size(); i++) {
                     Type et = n.el.elementAt(i).accept(this);
@@ -422,13 +429,13 @@ public class TypeCheckVisitor implements TypeVisitor {
     @Override
     public Type visit(This n) {
         if (currClass != null) {
-            if(currMethod != null) {
-                if(currMethod.getId().equals(Symbol.symbol("main"))) {
+            if (currMethod != null) {
+                if (currMethod.getId().equals(Symbol.symbol("main"))) {
                     error.complain("this can't be referenced from a static context");
                     return new VoidType(); // TODO: change this?
                 }
             }
-            
+
             return new IdentifierType(currClass.getId().toString());
         } else {
             error.complain("this referenced outside of class");

@@ -29,6 +29,10 @@ public class MethodTable {
     public Type getReturnType() {
         return returnType;
     }
+    
+    public int getNrOfParams() {
+        return params.size();
+    }
 
     public boolean putParam(Symbol key, Type value) {
         Param param = new Param(key, value);
