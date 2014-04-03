@@ -149,18 +149,18 @@ public class TreeBuilderVisitor implements TreeVisitor {
     @Override
     public Stm visit(MethodDecl n) {
         currMethod = currClass.getMethod(convertToSymbol(n.i));
+        ArrayList<Boolean> frameFormals = new ArrayList<Boolean>(n.fl.size());
+        currFrame = frameFactory.newFrame(new Label(n.i.toString()),
+                frameFormals);
 
         visit(n.fl);
         visit(n.vl);
         Stm statements = visit(n.sl);
-
-        // TODO: how to use this?
         AbstractExp returnExp = n.e.accept(this);
 
         currMethod = null;
-
-        // TODO: what temp to move the return value to?
-        return new SEQ(statements, new MOVE(new TEMP(new Temp()), returnExp));
+        return new SEQ(statements,
+                new MOVE(new TEMP(currFrame.RV()), returnExp));
     }
 
     @Override
