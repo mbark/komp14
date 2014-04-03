@@ -113,7 +113,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
         currClass = currProgram.get(convertToSymbol(n.i));
 
         // TODO: implement the vardecl visit
-        visit(n.vl);
+        ExpList varDecls = visit(n.vl);
         Stm methodDeclarations = visit(n.ml);
 
         currClass = null;
@@ -218,11 +218,12 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
         Label l1 = new Label();
         Label l2 = new Label();
-        
-        CJUMP cjump = new CJUMP(CJUMP.EQ, exp, new CONST(1), l1, l2);
-        Stm seq = toSEQ(cjump, new LABEL(l1), stmt1, new LABEL(l2), stmt2);
-        
-        return seq;
+
+        Stm cjump = new CJUMP(CJUMP.EQ, exp, new CONST(1), l1, l2);
+        Stm jump1 = toSEQ(new LABEL(l1), stmt1);
+        Stm jump2 = toSEQ(new LABEL(l2), stmt2);
+
+        return toSEQ(cjump, jump1, jump2);
     }
 
     @Override
@@ -361,8 +362,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
     @Override
     public AbstractExp visit(NewObject n) {
-        // TODO Auto-generated method stub
-        return null;
+        return new TEMP(new Temp());
     }
 
     @Override
@@ -373,8 +373,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
     @Override
     public AbstractExp visit(Identifier n) {
-        // TODO Auto-generated method stub
-        return null;
+        return new TEMP(new Temp());
     }
 
     private static Symbol convertToSymbol(Identifier i) {
@@ -454,7 +453,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
                 seq = new SEQ(seq, stm);
             }
         }
-        if(seq == null) {
+        if (seq == null) {
             return tmp;
         } else {
             return seq;
@@ -477,7 +476,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
                 seq = new SEQ(seq, stm);
             }
         }
-        if(seq == null) {
+        if (seq == null) {
             return tmp;
         } else {
             return seq;
@@ -501,14 +500,14 @@ public class TreeBuilderVisitor implements TreeVisitor {
                 if (tmp == null) {
                     tmp = stmts[i];
                 } else {
-                    seq = new SEQ(tmp, stmts[i]);
+                    seq = new SEQ(stmts[i], tmp);
                 }
             } else {
                 seq = new SEQ(stmts[i], seq);
             }
         }
 
-        if(seq == null) {
+        if (seq == null) {
             return tmp;
         } else {
             return seq;
