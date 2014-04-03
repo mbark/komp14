@@ -96,8 +96,6 @@ public class JVMVisitor {
     }
 
     public String visit(ClassDeclSimple n) {
-        // TODO Auto-generated method stub
-
         currClass = currProgram.get(convertToSymbol(n.i));
         currRecord = factory.newRecord(currClass.getId().toString());
 
@@ -228,7 +226,6 @@ public class JVMVisitor {
     }
 
     public String visit(LessThan n) {
-        // TODO Auto-generated method stub
         String left = n.e1.accept(this);
         String right = n.e2.accept(this);
 
