@@ -1,5 +1,6 @@
 package visitor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import symbol.ClassTable;
@@ -102,10 +103,13 @@ public class TreeBuilderVisitor implements TreeVisitor {
     public Stm visit(MainClass n) {
         currClass = currProgram.get(convertToSymbol(n.i1));
         currMethod = currClass.getMethod(Symbol.symbol("main"));
+        currFrame = frameFactory.newFrame(new Label("main"),
+                new ArrayList<Boolean>(0));
 
         visit(n.vl);
         Stm stm = n.s.accept(this);
 
+        currFrame = null;
         currMethod = null;
         currClass = null;
         return stm;
