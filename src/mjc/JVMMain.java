@@ -114,7 +114,8 @@ public class JVMMain {
             }
 
             // Build IR
-            TreeBuilderVisitor treeBuilder = new TreeBuilderVisitor(pt);
+            frame.Factory factory = new sparc.Factory();
+            TreeBuilderVisitor treeBuilder = new TreeBuilderVisitor(pt, factory);
             Stm stm = treeBuilder.visit(p);
 
             // Print IR

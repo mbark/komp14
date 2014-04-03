@@ -61,6 +61,7 @@ import tree.NAME;
 import tree.SEQ;
 import tree.Stm;
 import tree.TEMP;
+import frame.Factory;
 import frame.Frame;
 
 public class TreeBuilderVisitor implements TreeVisitor {
@@ -72,16 +73,16 @@ public class TreeBuilderVisitor implements TreeVisitor {
     private HashMap<AbstractExp, ClassTable> classesForExp;
 
     // TODO: use this
-    private Frame frame;
+    private Factory frameFactory;
+    private Frame currFrame;
 
-    public TreeBuilderVisitor(ProgramTable programTable) {
+    public TreeBuilderVisitor(ProgramTable programTable, Factory frameFactory) {
         currProgram = programTable;
         currClass = null;
         currMethod = null;
-
+        currFrame = null;
+        this.frameFactory = frameFactory;
         classesForExp = new HashMap<>();
-
-        frame = null;
     }
 
     @Override
@@ -129,7 +130,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
     public AbstractExp visit(VarDecl n) {
         // TODO: proper offset
         int offset = 0;
-        Temp fp = frame == null ? new Temp() : frame.FP();
+        Temp fp = currFrame == null ? new Temp() : currFrame.FP();
 
         AbstractExp exp = new MEM(new BINOP(BINOP.PLUS, new TEMP(fp),
                 new CONST(offset)));
@@ -159,7 +160,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
     public AbstractExp visit(Formal n) {
         // TODO: proper offset
         int offset = 0;
-        Temp fp = frame == null ? new Temp() : frame.FP();
+        Temp fp = currFrame == null ? new Temp() : currFrame.FP();
 
         AbstractExp exp = new MEM(new BINOP(BINOP.PLUS, new TEMP(fp),
                 new CONST(offset)));
