@@ -422,6 +422,13 @@ public class TypeCheckVisitor implements TypeVisitor {
     @Override
     public Type visit(This n) {
         if (currClass != null) {
+            if(currMethod != null) {
+                if(currMethod.getId().equals(Symbol.symbol("main"))) {
+                    error.complain("this can't be referenced from a static context");
+                    return new VoidType(); // TODO: change this?
+                }
+            }
+            
             return new IdentifierType(currClass.getId().toString());
         } else {
             error.complain("this referenced outside of class");

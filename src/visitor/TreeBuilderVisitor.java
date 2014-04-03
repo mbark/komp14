@@ -253,7 +253,6 @@ public class TreeBuilderVisitor implements TreeVisitor {
         AbstractExp left = n.e1.accept(this);
         AbstractExp right = n.e2.accept(this);
 
-        // TODO: implement
         return null;
     }
 
@@ -472,38 +471,38 @@ public class TreeBuilderVisitor implements TreeVisitor {
     }
     
     @Override
-    public AbstractExp visit(Identifier n) {
-        throw new UnsupportedOperationException();
+    public AbstractExp visit(IdentifierExp n) {
+//        TODO: temporary code
+        return new TEMP(new Temp());
     }
-
     
     @Override
-    public AbstractExp visit(IdentifierExp n) {
-        throw new UnsupportedOperationException();
+    public AbstractExp visit(Identifier n) {
+        return null;
     }
     
     @Override
     public AbstractExp visit(IntArrayType n) {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public AbstractExp visit(BooleanType n) {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public AbstractExp visit(IntegerType n) {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public AbstractExp visit(VoidType n) {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
     public AbstractExp visit(IdentifierType n) {
-        throw new UnsupportedOperationException();
+        return null;
     }
 }

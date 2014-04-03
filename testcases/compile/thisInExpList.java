@@ -3,12 +3,16 @@ class Main {
     	OtherClass c;
     	int i;
     	c = new OtherClass();
-    	i = c.foo(this);
+    	i = c.foo();
     }
 }
 
 class OtherClass {
-	public int foo(Main m) {
+	public int bar(OtherClass o) {
 		return 1;
+	}
+
+	public int foo() {
+		return this.bar(this);
 	}
 }
