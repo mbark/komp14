@@ -213,14 +213,16 @@ public class TreeBuilderVisitor implements TreeVisitor {
     public Stm visit(If n) {
         AbstractExp exp = n.e.accept(this);
 
-        // TODO: how to reference these?
         Stm stmt1 = n.s1.accept(this);
         Stm stmt2 = n.s2.accept(this);
 
         Label l1 = new Label();
         Label l2 = new Label();
-
-        return new CJUMP(CJUMP.EQ, exp, new CONST(1), l1, l2);
+        
+        CJUMP cjump = new CJUMP(CJUMP.EQ, exp, new CONST(1), l1, l2);
+        Stm seq = toSEQ(cjump, new LABEL(l1), stmt1, new LABEL(l2), stmt2);
+        
+        return seq;
     }
 
     @Override
