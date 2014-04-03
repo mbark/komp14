@@ -136,6 +136,7 @@ public class TreePrinter {
         } else if (s instanceof EXP) {
             prStm((EXP) s, d);
         } else {
+            say("null");
 //            throw new Error("Print.prStm " + " for " + s + " with d = " + d);
         }
     }
@@ -246,6 +247,7 @@ public class TreePrinter {
         } else if (e instanceof CALL) {
             prExp((CALL) e, d);
         } else {
+            say("null");
 //            throw new Error("Print.prExp " + " for " + e + " with d = " + d);
         }
     }

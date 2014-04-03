@@ -121,7 +121,6 @@ public class TreeBuilderVisitor implements TreeVisitor {
     public Stm visit(ClassDeclSimple n) {
         currClass = currProgram.get(convertToSymbol(n.i));
 
-        // TODO: implement the vardecl visit
         visit(n.vl);
         Stm methodDeclarations = visit(n.ml);
 
@@ -150,18 +149,18 @@ public class TreeBuilderVisitor implements TreeVisitor {
     @Override
     public Stm visit(MethodDecl n) {
         currMethod = currClass.getMethod(convertToSymbol(n.i));
-        // TODO Auto-generated method stub
 
-        ExpList formals = visit(n.fl);
+        visit(n.fl);
         visit(n.vl);
         Stm statements = visit(n.sl);
 
+        // TODO: how to use this?
         AbstractExp returnExp = n.e.accept(this);
 
-        // TODO: how to combine these into one Stm?
-
         currMethod = null;
-        return null;
+
+        // TODO: what temp to move the return value to?
+        return new SEQ(statements, new MOVE(new TEMP(new Temp()), returnExp));
     }
 
     @Override
@@ -378,7 +377,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
     @Override
     public AbstractExp visit(Not n) {
         AbstractExp e = n.e.accept(this);
-        
+
         return new BINOP(BINOP.AND, e, FALSE);
     }
 
@@ -431,7 +430,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
     }
 
     private void visit(VarDeclList vdl) {
-        for(int i = 0; i<vdl.size(); i++) {
+        for (int i = 0; i < vdl.size(); i++) {
             VarDecl vd = vdl.elementAt(i);
             Temp t = new Temp();
             tempForId.put(vd.i.s, t);
@@ -477,6 +476,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
                 seq = new SEQ(seq, stm);
             }
         }
+
         if (seq == null) {
             return tmp;
         } else {
