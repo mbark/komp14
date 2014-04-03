@@ -62,6 +62,7 @@ import tree.NAME;
 import tree.SEQ;
 import tree.Stm;
 import tree.TEMP;
+import frame.Access;
 import frame.Factory;
 import frame.Frame;
 
@@ -74,7 +75,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
     private MethodTable currMethod;
 
     private HashMap<AbstractExp, ClassTable> classesForExp;
-    private HashMap<String, Temp> tempForId;
+    private HashMap<String, AbstractExp> expForId;
 
     // TODO: use this
     private Factory frameFactory;
@@ -87,7 +88,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
         currFrame = null;
         this.frameFactory = frameFactory;
         classesForExp = new HashMap<>();
-        tempForId = new HashMap<>();
+        expForId = new HashMap<>();
     }
 
     @Override
@@ -135,15 +136,10 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
     @Override
     public AbstractExp visit(VarDecl n) {
-        // TODO: proper offset
-        int offset = 0;
-        Temp fp = currFrame == null ? new Temp() : currFrame.FP();
-
-        AbstractExp exp = new MEM(new BINOP(BINOP.PLUS, new TEMP(fp),
-                new CONST(offset)));
-        addExp(exp, n.i);
-
-        return exp;
+        Access a = currFrame.allocLocal(false);
+        AbstractExp ae = a.exp(new TEMP(currFrame.FP()));
+        expForId.put(n.i.s, ae);
+        return ae;
     }
 
     @Override
@@ -352,7 +348,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
     @Override
     public AbstractExp visit(IdentifierExp n) {
-        return new TEMP(tempForId.get(n.s));
+        return expForId.get(n.s);
     }
 
     @Override
@@ -431,9 +427,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
     private void visit(VarDeclList vdl) {
         for (int i = 0; i < vdl.size(); i++) {
-            VarDecl vd = vdl.elementAt(i);
-            Temp t = new Temp();
-            tempForId.put(vd.i.s, t);
+            vdl.elementAt(i).accept(this);
         }
     }
 
