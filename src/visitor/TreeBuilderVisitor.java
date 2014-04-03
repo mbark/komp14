@@ -100,6 +100,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
         currClass = currProgram.get(convertToSymbol(n.i1));
         currMethod = currClass.getMethod(Symbol.symbol("main"));
 
+        visit(n.vl);
         Stm stm = n.s.accept(this);
 
         currMethod = null;
@@ -234,7 +235,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
         Stm bodyStmt = n.s.accept(this);
         JUMP goToTest = new JUMP(test);
 
-        SEQ seq = toSEQ(new LABEL(test), checkIfDone, new LABEL(body),
+        Stm seq = toSEQ(new LABEL(test), checkIfDone, new LABEL(body),
                 bodyStmt, goToTest, new LABEL(done));
         return seq;
     }
@@ -451,8 +452,11 @@ public class TreeBuilderVisitor implements TreeVisitor {
                 seq = new SEQ(seq, stm);
             }
         }
-
-        return seq;
+        if(seq == null) {
+            return tmp;
+        } else {
+            return seq;
+        }
     }
 
     private Stm visit(MethodDeclList sl) {
@@ -471,8 +475,11 @@ public class TreeBuilderVisitor implements TreeVisitor {
                 seq = new SEQ(seq, stm);
             }
         }
-
-        return seq;
+        if(seq == null) {
+            return tmp;
+        } else {
+            return seq;
+        }
     }
 
     private String getMethodName(ClassTable klass, Identifier method) {
@@ -483,7 +490,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
         }
     }
 
-    private SEQ toSEQ(Stm... stmts) {
+    private Stm toSEQ(Stm... stmts) {
         SEQ seq = null;
         Stm tmp = null;
 
@@ -499,6 +506,10 @@ public class TreeBuilderVisitor implements TreeVisitor {
             }
         }
 
-        return seq;
+        if(seq == null) {
+            return tmp;
+        } else {
+            return seq;
+        }
     }
 }
