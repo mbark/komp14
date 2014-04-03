@@ -77,7 +77,6 @@ public class TreeBuilderVisitor implements TreeVisitor {
     private HashMap<AbstractExp, ClassTable> classesForExp;
     private HashMap<String, AbstractExp> expForId;
 
-    // TODO: use this
     private Factory frameFactory;
     private Frame currFrame;
 
@@ -106,7 +105,8 @@ public class TreeBuilderVisitor implements TreeVisitor {
     public Stm visit(MainClass n) {
         currClass = currProgram.get(convertToSymbol(n.i1));
         currMethod = currClass.getMethod(Symbol.symbol("main"));
-        currFrame = frameFactory.newFrame(new Label("main"),
+        currFrame = frameFactory.newFrame(
+                new Label(getMethodName(currClass, n.i1)),
                 new ArrayList<Boolean>(0));
 
         visit(n.vl);
@@ -121,10 +121,13 @@ public class TreeBuilderVisitor implements TreeVisitor {
     @Override
     public Stm visit(ClassDeclSimple n) {
         currClass = currProgram.get(convertToSymbol(n.i));
+        currFrame = frameFactory.newFrame(new Label(n.i.s),
+                new ArrayList<Boolean>(0));
 
         visit(n.vl);
         Stm methodDeclarations = visit(n.ml);
 
+        currFrame = null;
         currClass = null;
         return methodDeclarations;
     }
@@ -136,7 +139,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
     @Override
     public AbstractExp visit(VarDecl n) {
-        if(currFrame == null) {
+        if (currFrame == null) {
             return new TEMP(new Temp());
         }
         Access a = currFrame.allocLocal(false);
@@ -149,7 +152,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
     public Stm visit(MethodDecl n) {
         currMethod = currClass.getMethod(convertToSymbol(n.i));
         ArrayList<Boolean> frameFormals = new ArrayList<Boolean>(n.fl.size());
-        currFrame = frameFactory.newFrame(new Label(n.i.toString()),
+        currFrame = frameFactory.newFrame(new Label(getMethodName(currClass, n.i)),
                 frameFormals);
 
         visit(n.fl);
@@ -181,7 +184,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
         classesForExp.put(exp, currProgram.get(convertToSymbol(i)));
     }
 
-        @Override
+    @Override
     public Stm visit(Block n) {
         return visit(n.sl);
     }
@@ -470,18 +473,18 @@ public class TreeBuilderVisitor implements TreeVisitor {
             return seq;
         }
     }
-    
+
     @Override
     public AbstractExp visit(IdentifierExp n) {
-//        TODO: temporary code
+        // TODO: temporary code
         return new TEMP(new Temp());
     }
-    
+
     @Override
     public AbstractExp visit(Identifier n) {
         return null;
     }
-    
+
     @Override
     public AbstractExp visit(IntArrayType n) {
         return null;
