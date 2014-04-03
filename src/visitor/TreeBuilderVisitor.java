@@ -74,6 +74,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
     private MethodTable currMethod;
 
     private HashMap<AbstractExp, ClassTable> classesForExp;
+    private HashMap<String, Temp> tempForId;
 
     // TODO: use this
     private Factory frameFactory;
@@ -86,6 +87,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
         currFrame = null;
         this.frameFactory = frameFactory;
         classesForExp = new HashMap<>();
+        tempForId = new HashMap<>();
     }
 
     @Override
@@ -120,7 +122,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
         currClass = currProgram.get(convertToSymbol(n.i));
 
         // TODO: implement the vardecl visit
-        ExpList varDecls = visit(n.vl);
+        visit(n.vl);
         Stm methodDeclarations = visit(n.ml);
 
         currClass = null;
@@ -151,7 +153,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
         // TODO Auto-generated method stub
 
         ExpList formals = visit(n.fl);
-        ExpList varDecls = visit(n.vl);
+        visit(n.vl);
         Stm statements = visit(n.sl);
 
         AbstractExp returnExp = n.e.accept(this);
@@ -351,8 +353,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
     @Override
     public AbstractExp visit(IdentifierExp n) {
-        // TODO: some way to identify what this TEMP corresponds to
-        return new TEMP(new Temp());
+        return new TEMP(tempForId.get(n.s));
     }
 
     @Override
@@ -364,6 +365,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
     @Override
     public AbstractExp visit(NewArray n) {
         // TODO: some way to identify what this TEMP corresponds to
+        // TODO: correctly allocate the correct amount of memory
         return new TEMP(new Temp());
     }
 
@@ -427,23 +429,12 @@ public class TreeBuilderVisitor implements TreeVisitor {
         return telHead;
     }
 
-    private ExpList visit(VarDeclList vdl) {
-        tree.ExpList telHead = null;
-        tree.ExpList telTail = null;
-
-        for (int i = 0; i < vdl.size(); i++) {
-            AbstractExp ae = vdl.elementAt(i).accept(this);
-            if (telHead == null) {
-                telHead = new tree.ExpList(ae);
-                telTail = telHead;
-            } else {
-                ExpList newTelTail = new tree.ExpList(ae);
-                telTail.tail = newTelTail;
-                telTail = newTelTail;
-            }
+    private void visit(VarDeclList vdl) {
+        for(int i = 0; i<vdl.size(); i++) {
+            VarDecl vd = vdl.elementAt(i);
+            Temp t = new Temp();
+            tempForId.put(vd.i.s, t);
         }
-
-        return telHead;
     }
 
     private Stm visit(StatementList sl) {
