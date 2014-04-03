@@ -136,6 +136,9 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
     @Override
     public AbstractExp visit(VarDecl n) {
+        if(currFrame == null) {
+            return new TEMP(new Temp());
+        }
         Access a = currFrame.allocLocal(false);
         AbstractExp ae = a.exp(new TEMP(currFrame.FP()));
         expForId.put(n.i.s, ae);
@@ -178,37 +181,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
         classesForExp.put(exp, currProgram.get(convertToSymbol(i)));
     }
 
-    @Override
-    public AbstractExp visit(IntArrayType n) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public AbstractExp visit(BooleanType n) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public AbstractExp visit(IntegerType n) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public AbstractExp visit(VoidType n) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public AbstractExp visit(IdentifierType n) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
+        @Override
     public Stm visit(Block n) {
         return visit(n.sl);
     }
@@ -347,11 +320,6 @@ public class TreeBuilderVisitor implements TreeVisitor {
     }
 
     @Override
-    public AbstractExp visit(IdentifierExp n) {
-        return expForId.get(n.s);
-    }
-
-    @Override
     public AbstractExp visit(This n) {
         // TODO: some way to identify what this TEMP corresponds to
         return new TEMP(new Temp());
@@ -375,12 +343,6 @@ public class TreeBuilderVisitor implements TreeVisitor {
         AbstractExp e = n.e.accept(this);
 
         return new BINOP(BINOP.AND, e, FALSE);
-    }
-
-    @Override
-    public AbstractExp visit(Identifier n) {
-        // TODO: some way to identify what this TEMP corresponds to
-        return new TEMP(new Temp());
     }
 
     private static Symbol convertToSymbol(Identifier i) {
@@ -507,5 +469,41 @@ public class TreeBuilderVisitor implements TreeVisitor {
         } else {
             return seq;
         }
+    }
+    
+    @Override
+    public AbstractExp visit(Identifier n) {
+        throw new UnsupportedOperationException();
+    }
+
+    
+    @Override
+    public AbstractExp visit(IdentifierExp n) {
+        throw new UnsupportedOperationException();
+    }
+    
+    @Override
+    public AbstractExp visit(IntArrayType n) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public AbstractExp visit(BooleanType n) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public AbstractExp visit(IntegerType n) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public AbstractExp visit(VoidType n) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public AbstractExp visit(IdentifierType n) {
+        throw new UnsupportedOperationException();
     }
 }
