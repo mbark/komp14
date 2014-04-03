@@ -341,6 +341,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
     public AbstractExp visit(Not n) {
         AbstractExp e = n.e.accept(this);
 
+        // FIXME: use `=(e, FALSE)`?
         return new BINOP(BINOP.AND, e, FALSE);
     }
 
