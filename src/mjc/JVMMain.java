@@ -8,11 +8,13 @@ import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.List;
 
+import jvm.Factory;
 import symbol.ProgramTable;
 import syntaxtree.Program;
 import syntaxtree.SyntaxTreePrinter;
 import tree.Stm;
 import tree.TreePrinter;
+import visitor.JVMVisitor;
 import visitor.TreeBuilderVisitor;
 import visitor.TypeCheckVisitor;
 import visitor.TypeDefVisitor;
@@ -24,6 +26,7 @@ public class JVMMain {
         public boolean generateAssemblyCode = false;
         public boolean printSyntaxTree = false;
         public boolean printSymbolTable = false;
+        public boolean compileToJVM = false;
         public boolean printIntermediateRepresentation = false;
 
         public boolean parseOption(String option) {
@@ -36,6 +39,9 @@ public class JVMMain {
                 break;
             case "-sym":
                 printSymbolTable = true;
+                break;
+            case "-jvm":
+                compileToJVM = true;
                 break;
             case "-ir":
                 printIntermediateRepresentation = true;
@@ -111,6 +117,12 @@ public class JVMMain {
             // Print symbol table
             if (options.printSymbolTable) {
                 System.err.println(pt);
+            }
+
+            if(options.compileToJVM) {
+                JVMVisitor jvmVisitor = new JVMVisitor(pt, new jvm.Factory());
+                String s = jvmVisitor.visit(p);
+                System.err.println(s);
             }
 
             // Build IR

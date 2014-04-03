@@ -1,7 +1,7 @@
 package syntaxtree;
 
 import tree.AbstractExp;
-import tree.Stm;
+import visitor.JVMVisitor;
 import visitor.TreeVisitor;
 import visitor.TypeVisitor;
 import visitor.Visitor;
@@ -16,6 +16,10 @@ public class LessThan extends Exp {
 
     public void accept(Visitor v) {
         v.visit(this);
+    }
+
+    public String accept(JVMVisitor v) {
+        return v.visit(this);
     }
 
     public Type accept(TypeVisitor v) {
