@@ -41,9 +41,6 @@ import syntaxtree.True;
 import syntaxtree.VarDecl;
 import syntaxtree.VoidType;
 import syntaxtree.While;
-
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.StringType;
-
 import frame.VMAccess;
 import frame.VMFrame;
 import frame.VMRecord;
@@ -74,12 +71,12 @@ public class JVMVisitor {
     public String visit(Program n) {
         StringBuilder sb = new StringBuilder();
         String s = n.m.accept(this);
-        
+
         sb.append(s + "\n");
-        for(int i = 0; i<n.cl.size(); i++) {
+        for (int i = 0; i < n.cl.size(); i++) {
             sb.append(n.cl.elementAt(i).accept(this) + "\n");
         }
-        
+
         return sb.toString();
     }
 
@@ -88,11 +85,11 @@ public class JVMVisitor {
         currRecord = factory.newRecord(currClass.getId().toString());
 
         StringBuilder sb = new StringBuilder();
-        for(int i = 0; i<n.vl.size(); i++) {
+        for (int i = 0; i < n.vl.size(); i++) {
             sb.append(n.vl.elementAt(i).accept(this) + "\n");
         }
         sb.append(n.s.accept(this));
-        
+
         currRecord = null;
         currClass = null;
         return sb.toString();
@@ -139,7 +136,7 @@ public class JVMVisitor {
         currMethod = currClass.getMethod(convertToSymbol(n.i));
         currFrame = factory.newFrame(currMethod.getId().toString(), n.fl,
                 currMethod.getReturnType());
-        
+
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < n.fl.size(); i++) {
@@ -177,11 +174,6 @@ public class JVMVisitor {
         throw new UnsupportedOperationException();
     }
 
-    public String visit(StringType n) {
-        throw new UnsupportedOperationException();
-
-    }
-
     public String visit(IdentifierType n) {
         throw new UnsupportedOperationException();
     }
@@ -217,7 +209,7 @@ public class JVMVisitor {
         VMAccess access = getAccess(n.i);
 
         String s = n.e.accept(this);
-        if(s == null) {
+        if (s == null) {
             return "null";
         }
         s += "\n " + access.store();
@@ -252,7 +244,7 @@ public class JVMVisitor {
 
         return s;
     }
-    
+
     public String visit(Plus n) {
         return "iadd";
     }
