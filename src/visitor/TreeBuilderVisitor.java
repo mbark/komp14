@@ -56,7 +56,6 @@ import tree.CONST;
 import tree.ExpList;
 import tree.JUMP;
 import tree.LABEL;
-import tree.MEM;
 import tree.MOVE;
 import tree.NAME;
 import tree.SEQ;
@@ -152,8 +151,8 @@ public class TreeBuilderVisitor implements TreeVisitor {
     public Stm visit(MethodDecl n) {
         currMethod = currClass.getMethod(convertToSymbol(n.i));
         ArrayList<Boolean> frameFormals = new ArrayList<Boolean>(n.fl.size());
-        currFrame = frameFactory.newFrame(new Label(getMethodName(currClass, n.i)),
-                frameFormals);
+        currFrame = frameFactory.newFrame(
+                new Label(getMethodName(currClass, n.i)), frameFormals);
 
         visit(n.fl);
         visit(n.vl);
@@ -167,21 +166,14 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
     @Override
     public AbstractExp visit(Formal n) {
-        // TODO: proper offset
-        int offset = 0;
-        Temp fp = currFrame == null ? new Temp() : currFrame.FP();
+        Access a = currFrame.allocLocal(false);
+        AbstractExp ae = a.exp(new TEMP(currFrame.FP()));
 
-        AbstractExp exp = new MEM(new BINOP(BINOP.PLUS, new TEMP(fp),
-                new CONST(offset)));
-        addExp(exp, n.i);
-
-        return exp;
-    }
-
-    private void addExp(AbstractExp exp, Identifier i) {
         // TODO: fix the use of identifier (for example when identifier is a
         // booleantype etc)
-        classesForExp.put(exp, currProgram.get(convertToSymbol(i)));
+        classesForExp.put(ae, currProgram.get(convertToSymbol(n.i)));
+
+        return ae;
     }
 
     @Override
