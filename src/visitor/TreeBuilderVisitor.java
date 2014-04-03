@@ -377,8 +377,9 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
     @Override
     public AbstractExp visit(Not n) {
-        // TODO Auto-generated method stub
-        return null;
+        AbstractExp e = n.e.accept(this);
+        
+        return new BINOP(BINOP.AND, e, FALSE);
     }
 
     @Override
