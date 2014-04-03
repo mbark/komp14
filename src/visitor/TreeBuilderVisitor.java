@@ -65,6 +65,8 @@ import frame.Factory;
 import frame.Frame;
 
 public class TreeBuilderVisitor implements TreeVisitor {
+    private static final CONST TRUE = new CONST(1);
+    private static final CONST FALSE = new CONST(0);
 
     private ProgramTable currProgram;
     private ClassTable currClass;
@@ -220,7 +222,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
         Label l1 = new Label();
         Label l2 = new Label();
 
-        Stm cjump = new CJUMP(CJUMP.EQ, exp, new CONST(1), l1, l2);
+        Stm cjump = new CJUMP(CJUMP.EQ, exp, TRUE, l1, l2);
         Stm jump1 = toSEQ(new LABEL(l1), stmt1);
         Stm jump2 = toSEQ(new LABEL(l2), stmt2);
 
@@ -235,7 +237,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
         Label body = new Label();
         Label test = new Label();
 
-        CJUMP checkIfDone = new CJUMP(CJUMP.NE, exp, new CONST(0), done, body);
+        CJUMP checkIfDone = new CJUMP(CJUMP.EQ, exp, FALSE, done, body);
         Stm bodyStmt = n.s.accept(this);
         JUMP goToTest = new JUMP(test);
 
@@ -335,34 +337,35 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
     @Override
     public AbstractExp visit(True n) {
-        return new CONST(1);
+        return TRUE;
     }
 
     @Override
     public AbstractExp visit(False n) {
-        return new CONST(0);
+        return FALSE;
     }
 
     @Override
     public AbstractExp visit(IdentifierExp n) {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO: some way to identify what this TEMP corresponds to
+        return new TEMP(new Temp());
     }
 
     @Override
     public AbstractExp visit(This n) {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO: some way to identify what this TEMP corresponds to
+        return new TEMP(new Temp());
     }
 
     @Override
     public AbstractExp visit(NewArray n) {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO: some way to identify what this TEMP corresponds to
+        return new TEMP(new Temp());
     }
 
     @Override
     public AbstractExp visit(NewObject n) {
+        // TODO: some way to identify what this TEMP corresponds to
         return new TEMP(new Temp());
     }
 
@@ -374,6 +377,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
     @Override
     public AbstractExp visit(Identifier n) {
+        // TODO: some way to identify what this TEMP corresponds to
         return new TEMP(new Temp());
     }
 
