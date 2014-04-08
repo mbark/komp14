@@ -9,7 +9,7 @@ import syntaxtree.Type;
 import syntaxtree.VoidType;
 
 public class Hardware {
-    static String signature(Type t) {
+    public static String signature(Type t) {
         if (t instanceof BooleanType) {
             return "B";
         } else if (t instanceof IntegerType) {

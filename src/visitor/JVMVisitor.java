@@ -2,6 +2,7 @@ package visitor;
 
 import java.util.HashMap;
 
+import jvm.Hardware;
 import symbol.ClassTable;
 import symbol.MethodTable;
 import symbol.ProgramTable;
@@ -16,6 +17,7 @@ import syntaxtree.BooleanType;
 import syntaxtree.Call;
 import syntaxtree.ClassDeclExtends;
 import syntaxtree.ClassDeclSimple;
+import syntaxtree.Exp;
 import syntaxtree.False;
 import syntaxtree.Formal;
 import syntaxtree.FormalList;
@@ -300,13 +302,19 @@ public class JVMVisitor {
     }
 
     public String visit(ArrayLookup n) {
-        // TODO Auto-generated method stub
-        return null;
+        String o = n.e1.accept(this);
+        String i = n.e2.accept(this);
+        StringBuilder sb = appendOnNewline(o, i, "iaload");
+
+        return sb.toString();
     }
 
     public String visit(ArrayLength n) {
-        // TODO Auto-generated method stub
-        return null;
+        String array = n.e.accept(this);
+        // TODO: is this the right way? It's a bit hacky
+        StringBuilder sb = appendOnNewline(array,
+                "invokestatic java/lang/reflect/Array/getLength([java/lang/Object)");
+        return sb.toString();
     }
 
     public String visit(Call n) {
@@ -314,14 +322,16 @@ public class JVMVisitor {
 
         StringBuilder paramTypes = new StringBuilder();
         for (int i = 0; i < n.el.size(); i++) {
-            appendOnNewline(sb, n.el.elementAt(i).accept(this));
-            // TODO: use the actual type of the parameter
-            String type = "I";
+            Exp exp = n.el.elementAt(i);
+            appendOnNewline(sb, exp.accept(this));
+
+            String type = Hardware.signature(exp.getType());
+            // TODO: is there some separator between them?
             paramTypes.append(type);
         }
-
-        // TODO: get the actual classname
-        String className = "Foo";
+        
+        IdentifierType t = (IdentifierType) n.e.getType();
+        String className = t.s;
 
         String methodCall = "invokevirtual " + className + "/" + n.i.s + "("
                 + paramTypes.toString() + ")";
@@ -353,13 +363,14 @@ public class JVMVisitor {
     }
 
     public String visit(NewArray n) {
-        // TODO Auto-generated method stub
-        return null;
+        String size = n.e.accept(this);
+        StringBuilder sb = appendOnNewline("ldc " + size, "newarray int");
+
+        return sb.toString();
     }
 
     public String visit(NewObject n) {
-        // TODO: actual type
-        String type = "Foo";
+        String type = n.i.s;
         return "invokespecial " + type + "/<init>()V";
     }
 
