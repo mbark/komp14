@@ -255,11 +255,11 @@ public class JVMVisitor {
     }
 
     public String visit(Print n) {
-        // TODO: type of the expression n.e
+        String type = Hardware.signature(n.e.getType());
         StringBuilder sb = appendOnNewline(
                 "getstatic java/lang/System/out Ljava/io/PrintStream;",
                 n.e.accept(this),
-                "invokevirtual java/io/PrintStream/println(I)V");
+                "invokevirtual java/io/PrintStream/println(" + type + ")V");
 
         return sb.toString();
     }
