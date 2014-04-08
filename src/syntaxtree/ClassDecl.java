@@ -14,4 +14,6 @@ public abstract class ClassDecl {
     public abstract Stm accept(TreeVisitor v);
 
     public abstract String accept(JVMVisitor jvmVisitor);
+
+    public abstract String getName();
 }

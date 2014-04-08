@@ -131,28 +131,28 @@ public class JVMMain {
             viewer.expandTree();
         }
 
-        // Generate assembly
+        // Generate and write assembly
         if (options.generateAssemblyCode) {
-            String assemblyCode = "";
-
-            // ... for JVM
             if (options.target == Target.JVM) {
-                JVMVisitor jvmVisitor = new JVMVisitor(pt, new jvm.Factory());
-                assemblyCode = jvmVisitor.visit(p);
-            }
-
-            // Write assembly to file
-            File assemblyFile = new File("./"
-                    + sourceFile.getName().replace(".java", ".s"));
-            try {
-                PrintWriter pw = new PrintWriter(assemblyFile);
-                pw.write(assemblyCode);
-                pw.close();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace(System.err);
-                System.exit(1);
+                generateAndWriteJVMAssembly(p, pt);
+            } else {
+                // Write assembly to file
+                File assemblyFile = new File("./"
+                        + sourceFile.getName().replace(".java", ".s"));
+                try {
+                    PrintWriter pw = new PrintWriter(assemblyFile);
+                    pw.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace(System.err);
+                    System.exit(1);
+                }
             }
         }
+    }
+
+    private static void generateAndWriteJVMAssembly(Program p, ProgramTable pt) {
+        JVMVisitor jvmVisitor = new JVMVisitor(pt, new jvm.Factory());
+        jvmVisitor.visit(p);
     }
 
     private static Program parseFile(File sourceFile) {

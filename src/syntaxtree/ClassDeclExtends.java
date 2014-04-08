@@ -35,4 +35,10 @@ public class ClassDeclExtends extends ClassDecl {
     public Stm accept(TreeVisitor v) {
         return v.visit(this);
     }
+
+    @Override
+    public String getName() {
+        return i.s;
+    }
+
 }

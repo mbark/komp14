@@ -1,5 +1,8 @@
 package visitor;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 
 import jvm.Hardware;
@@ -15,6 +18,7 @@ import syntaxtree.Assign;
 import syntaxtree.Block;
 import syntaxtree.BooleanType;
 import syntaxtree.Call;
+import syntaxtree.ClassDecl;
 import syntaxtree.ClassDeclExtends;
 import syntaxtree.ClassDeclSimple;
 import syntaxtree.Exp;
@@ -75,15 +79,27 @@ public class JVMVisitor {
     }
 
     public String visit(Program n) {
-        StringBuilder sb = new StringBuilder();
-        String s = n.m.accept(this);
+        MainClass mc = n.m;
+        writeClassToFile(mc.i1.s, mc.accept(this));
 
-        appendOnNewline(sb, s);
         for (int i = 0; i < n.cl.size(); i++) {
-            appendOnNewline(sb, n.cl.elementAt(i).accept(this));
+            ClassDecl cd = n.cl.elementAt(i);
+            writeClassToFile(cd.getName(), cd.accept(this));
         }
 
-        return sb.toString();
+        return "";
+    }
+
+    private void writeClassToFile(String className, String assembly) {
+        File assemblyFile = new File("./" + className + ".s");
+        try {
+            PrintWriter pw = new PrintWriter(assemblyFile);
+            pw.write(assembly);
+            pw.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace(System.err);
+            System.exit(1);
+        }
     }
 
     public String visit(MainClass n) {
@@ -258,8 +274,8 @@ public class JVMVisitor {
         String type = Hardware.signature(n.e.getType());
         StringBuilder sb = appendOnNewline(
                 "getstatic java/lang/System/out Ljava/io/PrintStream;",
-                n.e.accept(this),
-                "invokevirtual java/io/PrintStream/println(" + type + ")V");
+                n.e.accept(this), "invokevirtual java/io/PrintStream/println("
+                        + type + ")V");
 
         return sb.toString();
     }
@@ -397,10 +413,10 @@ public class JVMVisitor {
         String exp = n.e.accept(this);
         String trueLbl = "TRUE";
 
-//        if true, push false else push true
-        StringBuilder sb = appendOnNewline(exp, "ldc " + TRUE, "ifeq " + trueLbl,
-                "ldc " + FALSE, trueLbl + ":", "ldc " + TRUE);
-        
+        // if true, push false else push true
+        StringBuilder sb = appendOnNewline(exp, "ldc " + TRUE, "ifeq "
+                + trueLbl, "ldc " + FALSE, trueLbl + ":", "ldc " + TRUE);
+
         return sb.toString();
     }
 
