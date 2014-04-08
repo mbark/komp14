@@ -104,7 +104,7 @@ public class JVMVisitor {
                 ".end method",
                 ".method public static main([Ljava/lang/String;)V");
 
-        int stackSize = currMethod.getNrOfLocals();
+        int stackSize = currMethod.getNrOfLocals() + 1;
         appendOnNewline(sb, ".limit stack " + stackSize);
 
         for (int i = 0; i < n.vl.size(); i++) {
@@ -130,7 +130,7 @@ public class JVMVisitor {
 
         StringBuilder sb = appendOnNewline(classDecl, inheritance,
                 ".method public ()V");
-        int stackSize = currClass.getNrOfFields();
+        int stackSize = currClass.getNrOfFields() + 1;
         appendOnNewline(sb, ".limit stack " + stackSize);
 
         appendOnNewline(sb, "alod 0",
