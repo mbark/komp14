@@ -453,14 +453,11 @@ public class TypeCheckVisitor implements TypeVisitor {
 
     @Override
     public Type visit(NewObject n) {
-        Symbol s = convertToSymbol(n.i);
-        ClassTable ct = currProgram.get(s);
-        if (ct != null) {
-            return new IdentifierType(s.toString());
-        } else {
-            error.complain("Type " + s + " is not defined");
-            return new VoidType(); // TODO: change this?
+        ClassTable ct = currProgram.get(convertToSymbol(n.i));
+        if (ct == null) {
+            error.complain("Type " + n.i.s + " is not defined");
         }
+        return new IdentifierType(n.i.s);
     }
 
     @Override
