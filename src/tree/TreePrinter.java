@@ -22,7 +22,7 @@ public class TreePrinter {
 
     void indent(int d) {
         for (int i = 0; i < d; i++) {
-            out.print(' ');
+            out.print("  ");
         }
     }
 
@@ -136,6 +136,7 @@ public class TreePrinter {
         } else if (s instanceof EXP) {
             prStm((EXP) s, d);
         } else {
+            indent(d);
             say("null");
 //            throw new Error("Print.prStm " + " for " + s + " with d = " + d);
         }

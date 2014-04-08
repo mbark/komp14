@@ -13,6 +13,7 @@ import syntaxtree.Program;
 import syntaxtree.SyntaxTreePrinter;
 import tree.Stm;
 import tree.TreePrinter;
+import tree.TreeViewer;
 import visitor.JVMVisitor;
 import visitor.TreeBuilderVisitor;
 import visitor.TypeCheckVisitor;
@@ -27,6 +28,7 @@ public class JVMMain {
         public boolean printSymbolTable = false;
         public boolean compileToJVM = false;
         public boolean printIntermediateRepresentation = false;
+        public boolean viewIntermediateRepresentation = false;
 
         public boolean parseOption(String option) {
             switch (option) {
@@ -44,6 +46,9 @@ public class JVMMain {
                 break;
             case "-ir":
                 printIntermediateRepresentation = true;
+                break;
+            case "-tv":
+                viewIntermediateRepresentation = true;
                 break;
             default:
                 return false;
@@ -118,7 +123,7 @@ public class JVMMain {
                 System.err.println(pt);
             }
 
-            if(options.compileToJVM) {
+            if (options.compileToJVM) {
                 JVMVisitor jvmVisitor = new JVMVisitor(pt, new jvm.Factory());
                 String s = jvmVisitor.visit(p);
                 System.err.println(s);
@@ -132,6 +137,13 @@ public class JVMMain {
             // Print IR
             if (options.printIntermediateRepresentation) {
                 new TreePrinter(System.err).prStm(stm);
+            }
+
+            // View IR
+            if (options.viewIntermediateRepresentation) {
+                TreeViewer viewer = new TreeViewer(sourceFile.getName());
+                viewer.addStm(stm);
+                viewer.expandTree();
             }
 
             // Generate assembly

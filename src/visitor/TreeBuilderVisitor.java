@@ -105,7 +105,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
         currClass = currProgram.get(convertToSymbol(n.i1));
         currMethod = currClass.getMethod(Symbol.symbol("main"));
         currFrame = frameFactory.newFrame(
-                new Label(getMethodName(currClass, n.i1)),
+                new Label(getMethodName(currClass, new Identifier("main"))),
                 new ArrayList<Boolean>(0));
 
         visit(n.vl);
