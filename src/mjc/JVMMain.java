@@ -26,9 +26,9 @@ public class JVMMain {
         public boolean generateAssemblyCode = false;
         public boolean printSyntaxTree = false;
         public boolean printSymbolTable = false;
-        public boolean compileToJVM = false;
         public boolean printIntermediateRepresentation = false;
         public boolean viewIntermediateRepresentation = false;
+        public Target target = Target.JVM;
 
         public boolean parseOption(String option) {
             switch (option) {
@@ -40,9 +40,6 @@ public class JVMMain {
                 break;
             case "-sym":
                 printSymbolTable = true;
-                break;
-            case "-jvm":
-                compileToJVM = true;
                 break;
             case "-ir":
                 printIntermediateRepresentation = true;
@@ -80,86 +77,99 @@ public class JVMMain {
             System.exit(1);
         }
 
+        // Iterate source files
         for (File sourceFile : sourceFiles) {
-            // Parse
-            Program p = null;
+            compileFile(sourceFile, options);
+        }
+    }
+
+    private static void compileFile(File sourceFile, Options options) {
+        // Parse
+        Program p = parseFile(sourceFile);
+
+        // Print syntax tree
+        if (options.printSyntaxTree) {
+            SyntaxTreePrinter stp = new SyntaxTreePrinter(System.err);
+            stp.visit(p);
+        }
+
+        // Type check: define types
+        ErrorMsg err = new ErrorMsg(System.err);
+        TypeDefVisitor tdv = new TypeDefVisitor(err);
+        tdv.visit(p);
+        if (err.hasAnyErrors()) {
+            System.exit(1);
+        }
+
+        // Type check: check types
+        ProgramTable pt = tdv.getProgramTable();
+        TypeCheckVisitor tcv = new TypeCheckVisitor(pt, err);
+        tcv.visit(p);
+        if (err.hasAnyErrors()) {
+            System.exit(1);
+        }
+
+        // Print symbol table
+        if (options.printSymbolTable) {
+            System.err.println(pt);
+        }
+
+        // Build IR
+        frame.Factory factory = new sparc.Factory();
+        TreeBuilderVisitor treeBuilder = new TreeBuilderVisitor(pt, factory);
+        Stm stm = treeBuilder.visit(p);
+
+        // Print IR
+        if (options.printIntermediateRepresentation) {
+            new TreePrinter(System.err).prStm(stm);
+        }
+
+        // View IR
+        if (options.viewIntermediateRepresentation) {
+            TreeViewer viewer = new TreeViewer(sourceFile.getName());
+            viewer.addStm(stm);
+            viewer.expandTree();
+        }
+
+        // Generate assembly
+        if (options.generateAssemblyCode) {
+            String assemblyCode = "";
+
+            // ... for JVM
+            if (options.target == Target.JVM) {
+                JVMVisitor jvmVisitor = new JVMVisitor(pt, new jvm.Factory());
+                assemblyCode = jvmVisitor.visit(p);
+            }
+
+            // Write assembly to file
+            File assemblyFile = new File("./"
+                    + sourceFile.getName().replace(".java", ".s"));
             try {
-                @SuppressWarnings("static-access")
-                Program prg = new Parser(new FileReader(sourceFile)).Program();
-                p = prg;
-            } catch (ParseException e) {
-                System.err.println("Syntax check failed: " + e.getMessage());
+                PrintWriter pw = new PrintWriter(assemblyFile);
+                pw.write(assemblyCode);
+                pw.close();
+            } catch (FileNotFoundException e) {
                 e.printStackTrace(System.err);
                 System.exit(1);
-            } catch (FileNotFoundException e) {
-                System.err.println("File not found: " + sourceFile);
-                System.exit(1);
-            }
-
-            // Print syntax tree
-            if (options.printSyntaxTree) {
-                SyntaxTreePrinter stp = new SyntaxTreePrinter(System.err);
-                stp.visit(p);
-            }
-
-            // Type check: define types
-            ErrorMsg err = new ErrorMsg(System.err);
-            TypeDefVisitor tdv = new TypeDefVisitor(err);
-            tdv.visit(p);
-            if (err.hasAnyErrors()) {
-                System.exit(1);
-            }
-
-            // Type check: check types
-            ProgramTable pt = tdv.getProgramTable();
-            TypeCheckVisitor tcv = new TypeCheckVisitor(pt, err);
-            tcv.visit(p);
-            if (err.hasAnyErrors()) {
-                System.exit(1);
-            }
-
-            // Print symbol table
-            if (options.printSymbolTable) {
-                System.err.println(pt);
-            }
-
-            if (options.compileToJVM) {
-                JVMVisitor jvmVisitor = new JVMVisitor(pt, new jvm.Factory());
-                String s = jvmVisitor.visit(p);
-                System.err.println(s);
-            }
-
-            // Build IR
-            frame.Factory factory = new sparc.Factory();
-            TreeBuilderVisitor treeBuilder = new TreeBuilderVisitor(pt, factory);
-            Stm stm = treeBuilder.visit(p);
-
-            // Print IR
-            if (options.printIntermediateRepresentation) {
-                new TreePrinter(System.err).prStm(stm);
-            }
-
-            // View IR
-            if (options.viewIntermediateRepresentation) {
-                TreeViewer viewer = new TreeViewer(sourceFile.getName());
-                viewer.addStm(stm);
-                viewer.expandTree();
-            }
-
-            // Generate assembly
-            if (options.generateAssemblyCode) {
-                File assemblyFile = new File("./"
-                        + sourceFile.getName().replace(".java", ".s"));
-                try {
-                    PrintWriter pw = new PrintWriter(assemblyFile);
-                    // TODO: write assembly code
-                    pw.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace(System.err);
-                    System.exit(1);
-                }
             }
         }
+    }
+
+    private static Program parseFile(File sourceFile) {
+        Program p = null;
+        try {
+            @SuppressWarnings("static-access")
+            Program prg = new Parser(new FileReader(sourceFile)).Program();
+            p = prg;
+        } catch (ParseException e) {
+            System.err.println("Syntax check failed: " + e.getMessage());
+            e.printStackTrace(System.err);
+            System.exit(1);
+        } catch (FileNotFoundException e) {
+            System.err.println("File not found: " + sourceFile);
+            System.exit(1);
+        }
+        return p;
     }
 
     private static void printUsage(PrintStream out) {
@@ -168,6 +178,8 @@ public class JVMMain {
         out.println("\t-S\tGenerate assembly code");
         out.println("\t-ast\tPrint abstract syntax tree");
         out.println("\t-sym\tPrint symbol table");
+        out.println("\t-ir\tPrint intermediate representation");
+        out.println("\t-tv\tView intermediate representation");
     }
 
 }
