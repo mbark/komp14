@@ -8,8 +8,6 @@ import visitor.Visitor;
 
 public class Call extends Exp {
     public Exp e;
-    public String c = null; // class of e
-
     public Identifier i;
     public ExpList el;
 

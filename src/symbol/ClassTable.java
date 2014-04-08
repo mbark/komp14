@@ -20,6 +20,10 @@ public class ClassTable {
     public Symbol getId() {
         return id;
     }
+    
+    public int getNrOfFields() {
+        return fields.size(); 
+    }
 
     public boolean put(Symbol key, MethodTable value) {
         if (methods.containsKey(key)) {

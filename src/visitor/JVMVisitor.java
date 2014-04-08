@@ -102,7 +102,7 @@ public class JVMVisitor {
                 ".end method",
                 ".method public static main([Ljava/lang/String;)V");
 
-        int stackSize = currMethod.getNrOfLocals() + 1;
+        int stackSize = currMethod.getNrOfLocals();
         appendOnNewline(sb, ".limit stack " + stackSize);
 
         for (int i = 0; i < n.vl.size(); i++) {
@@ -120,13 +120,25 @@ public class JVMVisitor {
 
     public String visit(ClassDeclSimple n) {
         currClass = currProgram.get(convertToSymbol(n.i));
-        currRecord = factory.newRecord(currClass.getId().toString());
+        String className = currClass.getId().toString();
+        currRecord = factory.newRecord(className);
 
-        StringBuilder sb = new StringBuilder();
+        String classDecl = ".class public " + className;
+        String inheritance = ".super java/lang/Object" + "\n";
+
+        StringBuilder sb = appendOnNewline(classDecl, inheritance,
+                ".method public ()V");
+        int stackSize = currClass.getNrOfFields();
+        appendOnNewline(sb, ".limit stack " + stackSize);
+
+        appendOnNewline(sb, "alod 0",
+                "invokespecial java/lang/Object/<init>()V");
+
         for (int i = 0; i < n.vl.size(); i++) {
-            String s = n.vl.elementAt(i).accept(this);
-            sb.append(s + "\n");
+            appendOnNewline(sb, n.vl.elementAt(i).accept(this));
         }
+
+        appendOnNewline("return", ".end method");
 
         currRecord = null;
         currClass = null;
@@ -149,12 +161,7 @@ public class JVMVisitor {
         }
 
         addAccess(n.i, access);
-        // FIXME: is this the right way to set the standard value for a
-        // variable?
-        StringBuilder sb = appendOnNewline(access.declare(), "ldc 0",
-                "istore_0");
-
-        return sb.toString();
+        return access.declare();
     }
 
     public String visit(MethodDecl n) {
@@ -303,8 +310,24 @@ public class JVMVisitor {
     }
 
     public String visit(Call n) {
-        // TODO Auto-generated method stub
-        return null;
+        StringBuilder sb = appendOnNewline(n.e.accept(this));
+
+        StringBuilder paramTypes = new StringBuilder();
+        for (int i = 0; i < n.el.size(); i++) {
+            appendOnNewline(sb, n.el.elementAt(i).accept(this));
+            // TODO: use the actual type of the parameter
+            String type = "I";
+            paramTypes.append(type);
+        }
+
+        // TODO: get the actual classname
+        String className = "Foo";
+
+        String methodCall = "invokevirtual " + className + "/" + n.i.s + "("
+                + paramTypes.toString() + ")";
+        appendOnNewline(sb, methodCall);
+
+        return sb.toString();
     }
 
     public String visit(IntegerLiteral n) {
@@ -325,8 +348,8 @@ public class JVMVisitor {
     }
 
     public String visit(This n) {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO: I think this is how you do it
+        return "aload_0";
     }
 
     public String visit(NewArray n) {
@@ -335,8 +358,9 @@ public class JVMVisitor {
     }
 
     public String visit(NewObject n) {
-        // TODO: Auto-generated method stub
-        return null;
+        // TODO: actual type
+        String type = "Foo";
+        return "invokespecial " + type + "/<init>()V";
     }
 
     public String visit(Not n) {

@@ -10,6 +10,7 @@ class Foo {
     public static void main(String[] args) {
         // A comment on a separate line
         int a; // A comment after a vardecl
+        a = 1;
         a = (a) + 3;
         System.out.println(a);
     }
