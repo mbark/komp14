@@ -9,6 +9,8 @@ import visitor.Visitor;
 public class IdentifierExp extends Exp {
     public String s;
 
+    private Type t;
+
     public IdentifierExp(String as) {
         s = as;
     }
@@ -22,10 +24,21 @@ public class IdentifierExp extends Exp {
     }
 
     public Type accept(TypeVisitor v) {
-        return v.visit(this);
+        t = v.visit(this);
+        return t;
     }
 
     public AbstractExp accept(TreeVisitor v) {
         return v.visit(this);
+    }
+
+    @Override
+    public Type getType() {
+        if (t != null) {
+            return t;
+        } else {
+            throw new IllegalStateException(
+                    "IdentifierExp#getType called before typecheck!");
+        }
     }
 }

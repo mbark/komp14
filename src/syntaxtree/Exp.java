@@ -8,10 +8,12 @@ import visitor.Visitor;
 
 public abstract class Exp {
     public abstract void accept(Visitor v);
-    
+
     public abstract String accept(JVMVisitor v);
 
     public abstract Type accept(TypeVisitor v);
 
     public abstract AbstractExp accept(TreeVisitor v);
+
+    public abstract Type getType();
 }

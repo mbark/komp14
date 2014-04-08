@@ -28,4 +28,9 @@ public class IntegerLiteral extends Exp {
     public AbstractExp accept(TreeVisitor v) {
         return v.visit(this);
     }
+
+    @Override
+    public Type getType() {
+        return new IntegerType();
+    }
 }

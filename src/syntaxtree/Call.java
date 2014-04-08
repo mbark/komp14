@@ -11,10 +11,13 @@ public class Call extends Exp {
     public Identifier i;
     public ExpList el;
 
+    private Type t;
+
     public Call(Exp ae, Identifier ai, ExpList ael) {
         e = ae;
         i = ai;
         el = ael;
+        t = null;
     }
 
     public void accept(Visitor v) {
@@ -26,10 +29,21 @@ public class Call extends Exp {
     }
 
     public Type accept(TypeVisitor v) {
-        return v.visit(this);
+        t = v.visit(this);
+        return t;
     }
 
     public AbstractExp accept(TreeVisitor v) {
         return v.visit(this);
+    }
+
+    @Override
+    public Type getType() {
+        if (t != null) {
+            return t;
+        } else {
+            throw new IllegalStateException(
+                    "Call#getType called before typecheck!");
+        }
     }
 }
