@@ -219,20 +219,39 @@ public class JVMVisitor {
     public String visit(Block n) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < n.sl.size(); i++) {
-            sb.append(n.sl.elementAt(i).accept(this) + "\n");
+            appendOnNewline(sb, n.sl.elementAt(i).accept(this));
         }
 
         return sb.toString();
     }
 
     public String visit(If n) {
-        // TODO Auto-generated method stub
-        return null;
+        String exp = n.e.accept(this);
+        String s1 = n.s1.accept(this);
+        String s2 = n.s2.accept(this);
+
+        // TODO: Labels must be unique (I think)
+        String lbl = "STATEMENT_2";
+
+        StringBuilder sb = appendOnNewline(exp, "ldc " + TRUE, "ifne " + lbl,
+                s1, lbl + ":", s2);
+
+        return sb.toString();
     }
 
     public String visit(While n) {
-        // TODO Auto-generated method stub
-        return null;
+        String exp = n.e.accept(this);
+        String s = n.s.accept(this);
+
+        // TODO: Labels must be unique (I think)
+        String whileLabel = "while";
+        String doneLabel = "done";
+
+        StringBuilder sb = appendOnNewline(whileLabel + ":", exp,
+                "ldc " + TRUE, "ifne " + doneLabel, s, "goto " + whileLabel,
+                doneLabel + ":");
+
+        return sb.toString();
     }
 
     public String visit(Print n) {
@@ -329,7 +348,7 @@ public class JVMVisitor {
             // TODO: is there some separator between them?
             paramTypes.append(type);
         }
-        
+
         IdentifierType t = (IdentifierType) n.e.getType();
         String className = t.s;
 
@@ -375,13 +394,19 @@ public class JVMVisitor {
     }
 
     public String visit(Not n) {
-        // TODO Auto-generated method stub
-        return null;
+        String exp = n.e.accept(this);
+        String trueLbl = "TRUE";
+
+//        if true, push false else push true
+        StringBuilder sb = appendOnNewline(exp, "ldc " + TRUE, "ifeq " + trueLbl,
+                "ldc " + FALSE, trueLbl + ":", "ldc " + TRUE);
+        
+        return sb.toString();
     }
 
     public String visit(Identifier n) {
-        // TODO Auto-generated method stub
-        return null;
+        VMAccess access = getAccess(n);
+        return access.load();
     }
 
     private static Symbol convertToSymbol(Identifier i) {
