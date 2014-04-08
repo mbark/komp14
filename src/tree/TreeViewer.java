@@ -8,19 +8,19 @@ import javax.swing.tree.DefaultMutableTreeNode;
 /**
  * A class that creates a tree view of Appel's TREE code. Can be used as
  * follows:
- * 
+ *
  * <PRE>
  * tree.View viewer = new tree.View(&quot;Name of function&quot;);
  * viewer.addStm(treeBody);
  * viewer.expandTree();
  * </PRE>
  */
-public class View {
+public class TreeViewer {
 
     private DefaultMutableTreeNode top;
     private JTree tree;
 
-    public View(String title) {
+    public TreeViewer(String title) {
         top = new DefaultMutableTreeNode(title);
         tree = new JTree(top);
         JScrollPane pane = new JScrollPane(tree);
@@ -121,6 +121,9 @@ public class View {
     }
 
     void addStm(Stm s, DefaultMutableTreeNode parent) {
+        if (s == null) {
+            parent.add(new DefaultMutableTreeNode("<null>"));
+        }
         if (s instanceof SEQ) {
             addStm((SEQ) s, parent);
         } else if (s instanceof LABEL) {
