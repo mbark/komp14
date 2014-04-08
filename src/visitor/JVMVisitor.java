@@ -18,6 +18,7 @@ import syntaxtree.ClassDeclExtends;
 import syntaxtree.ClassDeclSimple;
 import syntaxtree.False;
 import syntaxtree.Formal;
+import syntaxtree.FormalList;
 import syntaxtree.Identifier;
 import syntaxtree.IdentifierExp;
 import syntaxtree.IdentifierType;
@@ -56,6 +57,9 @@ public class JVMVisitor {
 
     private HashMap<Identifier, VMAccess> accesses;
 
+    private static final int FALSE = 0;
+    private static final int TRUE = 1;
+
     public JVMVisitor(ProgramTable pt, jvm.Factory factory) {
         currProgram = pt;
         currClass = null;
@@ -72,9 +76,9 @@ public class JVMVisitor {
         StringBuilder sb = new StringBuilder();
         String s = n.m.accept(this);
 
-        sb.append(s + "\n");
+        appendOnNewline(sb, s);
         for (int i = 0; i < n.cl.size(); i++) {
-            sb.append(n.cl.elementAt(i).accept(this) + "\n");
+            appendOnNewline(sb, n.cl.elementAt(i).accept(this));
         }
 
         return sb.toString();
@@ -82,14 +86,33 @@ public class JVMVisitor {
 
     public String visit(MainClass n) {
         currClass = currProgram.get(convertToSymbol(n.i1));
-        currRecord = factory.newRecord(currClass.getId().toString());
+        String className = currClass.getId().toString();
+        currRecord = factory.newRecord(className);
 
-        StringBuilder sb = new StringBuilder();
+        currMethod = currClass.getMethod(Symbol.symbol("main"));
+        currFrame = factory.newFrame("main", new FormalList(),
+                currMethod.getReturnType());
+
+        String classDecl = ".class public " + className;
+        String inheritance = ".super java/lang/Object" + "\n";
+
+        StringBuilder sb = appendOnNewline(classDecl, inheritance,
+                ".method public ()V", "aload_0",
+                "invokenonvirtual java/lang/Object/()V", "return",
+                ".end method",
+                ".method public static main([Ljava/lang/String;)V");
+
+        int stackSize = currMethod.getNrOfLocals() + 1;
+        appendOnNewline(sb, ".limit stack " + stackSize);
+
         for (int i = 0; i < n.vl.size(); i++) {
             sb.append(n.vl.elementAt(i).accept(this) + "\n");
         }
         sb.append(n.s.accept(this));
 
+        appendOnNewline(sb, "return", ".end method");
+
+        currFrame = null;
         currRecord = null;
         currClass = null;
         return sb.toString();
@@ -126,8 +149,12 @@ public class JVMVisitor {
         }
 
         addAccess(n.i, access);
+        // FIXME: is this the right way to set the standard value for a
+        // variable?
+        StringBuilder sb = appendOnNewline(access.declare(), "ldc 0",
+                "istore_0");
 
-        return access.store();
+        return sb.toString();
     }
 
     public String visit(MethodDecl n) {
@@ -181,11 +208,12 @@ public class JVMVisitor {
     }
 
     public String visit(Block n) {
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < n.sl.size(); i++) {
-            n.sl.elementAt(i).accept(this);
+            sb.append(n.sl.elementAt(i).accept(this) + "\n");
         }
 
-        return null;
+        return sb.toString();
     }
 
     public String visit(If n) {
@@ -199,20 +227,19 @@ public class JVMVisitor {
     }
 
     public String visit(Print n) {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO: type of the expression n.e
+        StringBuilder sb = appendOnNewline(
+                "getstatic java/lang/System/out Ljava/io/PrintStream;",
+                n.e.accept(this),
+                "invokevirtual java/io/PrintStream/println(I)V");
+
+        return sb.toString();
     }
 
     public String visit(Assign n) {
         VMAccess access = getAccess(n.i);
-
-        String s = n.e.accept(this);
-        if (s == null) {
-            return "null";
-        }
-        s += "\n " + access.store();
-
-        return s;
+        StringBuilder sb = appendOnNewline(n.e.accept(this), access.store());
+        return sb.toString();
     }
 
     public String visit(ArrayAssign n) {
@@ -221,8 +248,7 @@ public class JVMVisitor {
     }
 
     public String visit(And n) {
-        // TODO Auto-generated method stub
-        return null;
+        return "iand";
     }
 
     public String visit(LessThan n) {
@@ -243,15 +269,27 @@ public class JVMVisitor {
     }
 
     public String visit(Plus n) {
-        return "iadd";
+        String left = n.e1.accept(this);
+        String right = n.e2.accept(this);
+
+        StringBuilder sb = appendOnNewline(left, right, "iadd");
+        return sb.toString();
     }
 
     public String visit(Minus n) {
-        return "isub";
+        String left = n.e1.accept(this);
+        String right = n.e2.accept(this);
+
+        StringBuilder sb = appendOnNewline(left, right, "isub");
+        return sb.toString();
     }
 
     public String visit(Times n) {
-        return "imul";
+        String left = n.e1.accept(this);
+        String right = n.e2.accept(this);
+
+        StringBuilder sb = appendOnNewline(left, right, "imul");
+        return sb.toString();
     }
 
     public String visit(ArrayLookup n) {
@@ -274,18 +312,16 @@ public class JVMVisitor {
     }
 
     public String visit(True n) {
-        // TODO Auto-generated method stub
-        return null;
+        return "ldc " + TRUE;
     }
 
     public String visit(False n) {
-        // TODO Auto-generated method stub
-        return null;
+        return "ldc " + FALSE;
     }
 
     public String visit(IdentifierExp n) {
-        // TODO Auto-generated method stub
-        return null;
+        VMAccess access = getAccess(new Identifier(n.s));
+        return access.load();
     }
 
     public String visit(This n) {
@@ -323,5 +359,21 @@ public class JVMVisitor {
 
     private VMAccess getAccess(Identifier i) {
         return accesses.get(i);
+    }
+
+    private StringBuilder appendOnNewline(String... s) {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < s.length; i++) {
+            sb.append(s[i] + "\n");
+        }
+
+        return sb;
+    }
+
+    private void appendOnNewline(StringBuilder sb, String... s) {
+        for (int i = 0; i < s.length; i++) {
+            sb.append(s[i] + "\n");
+        }
     }
 }

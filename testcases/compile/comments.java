@@ -11,5 +11,6 @@ class Foo {
         // A comment on a separate line
         int a; // A comment after a vardecl
         a = (a) + 3;
+        System.out.println(a);
     }
 }

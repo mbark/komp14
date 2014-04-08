@@ -8,7 +8,6 @@ import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.List;
 
-import jvm.Factory;
 import symbol.ProgramTable;
 import syntaxtree.Program;
 import syntaxtree.SyntaxTreePrinter;

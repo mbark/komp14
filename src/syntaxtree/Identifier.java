@@ -1,6 +1,5 @@
 package syntaxtree;
 
-import mjc.SourceLocation;
 import mjc.Token;
 import tree.AbstractExp;
 import visitor.JVMVisitor;
@@ -9,8 +8,32 @@ import visitor.TypeVisitor;
 import visitor.Visitor;
 
 public class Identifier {
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((s == null) ? 0 : s.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Identifier other = (Identifier) obj;
+        if (s == null) {
+            if (other.s != null)
+                return false;
+        } else if (!s.equals(other.s))
+            return false;
+        return true;
+    }
+
     public String s;
-    public SourceLocation sourceLocation;
 
     public Identifier(String as) {
         s = as;
@@ -18,8 +41,6 @@ public class Identifier {
 
     public Identifier(Token t) {
         s = t.toString();
-        sourceLocation = new SourceLocation(t.beginLine, t.beginColumn,
-                t.endLine, t.endColumn);
     }
 
     public void accept(Visitor v) {
@@ -42,4 +63,5 @@ public class Identifier {
         return s;
     }
 
+    
 }

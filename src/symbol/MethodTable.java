@@ -33,6 +33,10 @@ public class MethodTable {
     public int getNrOfParams() {
         return params.size();
     }
+    
+    public int getNrOfLocals() {
+        return locals.size();
+    }
 
     public boolean putParam(Symbol key, Type value) {
         Param param = new Param(key, value);

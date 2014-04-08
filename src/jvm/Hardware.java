@@ -6,6 +6,7 @@ import syntaxtree.IdentifierType;
 import syntaxtree.IntArrayType;
 import syntaxtree.IntegerType;
 import syntaxtree.Type;
+import syntaxtree.VoidType;
 
 public class Hardware {
     static String signature(Type t) {
@@ -17,6 +18,8 @@ public class Hardware {
             return "[I";
         } else if (t instanceof IdentifierType) {
             return "L" + t.toString() + ";";
+        } else if (t instanceof VoidType) {
+            return "V";
         } else {
             throw new InternalError("Unknown type " + t);
         }
