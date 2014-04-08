@@ -8,6 +8,7 @@ import visitor.TypeVisitor;
 import visitor.Visitor;
 
 public class Identifier {
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -18,18 +19,23 @@ public class Identifier {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         Identifier other = (Identifier) obj;
         if (s == null) {
-            if (other.s != null)
+            if (other.s != null) {
                 return false;
-        } else if (!s.equals(other.s))
+            }
+        } else if (!s.equals(other.s)) {
             return false;
+        }
         return true;
     }
 
@@ -63,5 +69,4 @@ public class Identifier {
         return s;
     }
 
-    
 }
