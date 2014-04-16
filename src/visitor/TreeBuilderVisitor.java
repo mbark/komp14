@@ -57,6 +57,7 @@ import tree.EXP;
 import tree.ExpList;
 import tree.JUMP;
 import tree.LABEL;
+import tree.MEM;
 import tree.MOVE;
 import tree.NAME;
 import tree.SEQ;
@@ -282,8 +283,16 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
     @Override
     public AbstractExp visit(ArrayLookup n) {
-        // TODO Auto-generated method stub
-        return null;
+        AbstractExp arrayBase = null;
+
+        // FIXME: this is a hack!
+        if (n.e1 instanceof IdentifierExp) {
+            IdentifierExp ie = (IdentifierExp) n.e1;
+            arrayBase = expForId.get(ie.s);
+        }
+
+        AbstractExp arrayOffset = n.e2.accept(this);
+        return new MEM(new BINOP(BINOP.PLUS, arrayBase, arrayOffset));
     }
 
     @Override
@@ -326,9 +335,9 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
     @Override
     public AbstractExp visit(NewArray n) {
-        // TODO: some way to identify what this TEMP corresponds to
-        // TODO: correctly allocate the correct amount of memory
-        return new TEMP(new Temp());
+        AbstractExp ae = n.e.accept(this);
+        return currFrame.externalCall("initArray",
+                new ExpList(ae, new CONST(0)));
     }
 
     @Override
