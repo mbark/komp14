@@ -59,7 +59,6 @@ import tree.JUMP;
 import tree.LABEL;
 import tree.MOVE;
 import tree.NAME;
-import tree.PRINT;
 import tree.SEQ;
 import tree.Stm;
 import tree.TEMP;
@@ -223,7 +222,8 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
     @Override
     public Stm visit(Print n) {
-        return new PRINT(n.e.accept(this));
+        AbstractExp ae = n.e.accept(this);
+        return new EXP(currFrame.externalCall("print", new ExpList(ae)));
     }
 
     @Override
