@@ -1,6 +1,17 @@
 #!/bin/bash
 
-compdir=$(cd "$(dirname $0)/.."; pwd)
-java_classpath=$compdir/mjc.jar:$compdir/lib/javacc.jar
+set -e
 
-java -cp $java_classpath mjc.JVMMain $@
+compdir=$(cd "$(dirname $0)/.."; pwd)
+
+# Clean
+rm -f $compdir/*.s
+
+# Compile to Jasmine
+java -cp $compdir/mjc.jar:$compdir/lib/javacc.jar mjc.JVMMain $@ -S
+
+# Compile to JVM bytecode
+java -jar $compdir/lib/jasmin.jar $compdir/*.s > /dev/null
+
+# Run it
+java -cp $compdir "`basename -s.java $1`"
