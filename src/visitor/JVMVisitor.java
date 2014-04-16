@@ -46,7 +46,6 @@ import syntaxtree.Program;
 import syntaxtree.This;
 import syntaxtree.Times;
 import syntaxtree.True;
-import syntaxtree.Type;
 import syntaxtree.VarDecl;
 import syntaxtree.VoidType;
 import syntaxtree.While;
@@ -291,9 +290,8 @@ public class JVMVisitor {
         String whileLabel = labels.newLabel("while");
         String doneLabel = labels.newLabel("done");
 
-        StringBuilder sb = appendOnNewline(whileLabel + ":", exp,
-                "ldc " + TRUE, "ifne " + doneLabel, s, "goto " + whileLabel,
-                doneLabel + ":");
+        StringBuilder sb = appendOnNewline(whileLabel + ":", exp, "ifeq "
+                + doneLabel, s, "goto " + whileLabel, doneLabel + ":");
 
         return sb.toString();
     }
@@ -318,9 +316,10 @@ public class JVMVisitor {
         VMAccess access = getAccess(n.i);
         String index = n.e1.accept(this);
         String value = n.e2.accept(this);
-        
-        StringBuilder sb = appendOnNewline(access.load(), index, value, "iastore");
-        
+
+        StringBuilder sb = appendOnNewline(access.load(), index, value,
+                "iastore");
+
         return sb.toString();
     }
 
@@ -346,7 +345,7 @@ public class JVMVisitor {
         String end = labels.newLabel("end");
 
         StringBuilder sb = appendOnNewline(right, left);
-        appendOnNewline(sb, "if_icmplt " + greaterThan);
+        appendOnNewline(sb, "if_icmple " + greaterThan);
         appendOnNewline(sb, "iconst_1", "goto " + end, greaterThan + ":",
                 "iconst_0", end + ":");
 
@@ -453,11 +452,12 @@ public class JVMVisitor {
 
     public String visit(Not n) {
         String exp = n.e.accept(this);
-        String trueLbl = "TRUE";
+        String trueLbl = labels.newLabel("true");
+        String endLbl = labels.newLabel("end");
 
         // if true, push false else push true
-        StringBuilder sb = appendOnNewline(exp, "ldc " + TRUE, "ifeq "
-                + trueLbl, "ldc " + FALSE, trueLbl + ":", "ldc " + TRUE);
+        StringBuilder sb = appendOnNewline(exp, "ifeq " + trueLbl, "ldc "
+                + FALSE, "goto " + endLbl,  trueLbl + ":", "ldc " + TRUE, endLbl + ":");
 
         return sb.toString();
     }

@@ -18,6 +18,6 @@ public class LabelTable {
         }
         
         table.put(name, i);
-        return name + i;
+        return "label_" + name + i;
     }
 }
