@@ -115,6 +115,13 @@ public class TreePrinter {
         say(")");
     }
 
+    void prStm(PRINT s, int d) {
+        indent(d);
+        sayln("PRINT(");
+        prExp(s.e, d + 1);
+        say(")");
+    }
+
     void prStm(EXP s, int d) {
         indent(d);
         sayln("EXP(");
@@ -133,12 +140,14 @@ public class TreePrinter {
             prStm((CJUMP) s, d);
         } else if (s instanceof MOVE) {
             prStm((MOVE) s, d);
+        } else if (s instanceof PRINT) {
+            prStm((PRINT) s, d);
         } else if (s instanceof EXP) {
             prStm((EXP) s, d);
         } else {
             indent(d);
             say("null");
-//            throw new Error("Print.prStm " + " for " + s + " with d = " + d);
+            // throw new Error("Print.prStm " + " for " + s + " with d = " + d);
         }
     }
 
@@ -250,7 +259,7 @@ public class TreePrinter {
         } else {
             indent(d);
             say("null");
-//            throw new Error("Print.prExp " + " for " + e + " with d = " + d);
+            // throw new Error("Print.prExp " + " for " + e + " with d = " + d);
         }
     }
 

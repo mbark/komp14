@@ -58,6 +58,7 @@ import tree.JUMP;
 import tree.LABEL;
 import tree.MOVE;
 import tree.NAME;
+import tree.PRINT;
 import tree.SEQ;
 import tree.Stm;
 import tree.TEMP;
@@ -217,8 +218,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
     @Override
     public Stm visit(Print n) {
-        // TODO Auto-generated method stub
-        return null;
+        return new PRINT(n.e.accept(this));
     }
 
     @Override
