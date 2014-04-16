@@ -222,8 +222,8 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
     @Override
     public Stm visit(Print n) {
-        // TODO Auto-generated method stub
-        return null;
+        AbstractExp ae = n.e.accept(this);
+        return new EXP(currFrame.externalCall("print", new ExpList(ae)));
     }
 
     @Override
