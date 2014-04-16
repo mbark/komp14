@@ -114,7 +114,7 @@ public class JVMVisitor {
         currFrame = factory.newFrame("main", new FormalList(),
                 currMethod.getReturnType());
 
-        String classDecl = ".class public " + className;
+        String classDecl = ".class public \'" + className + "\'";
         String inheritance = ".super java/lang/Object";
 
         StringBuilder sb = appendOnNewline(classDecl, inheritance,
@@ -147,7 +147,7 @@ public class JVMVisitor {
         String className = currClass.getId().toString();
         currRecord = factory.newRecord(className);
 
-        StringBuilder sb = appendOnNewline(".class public " + className,
+        StringBuilder sb = appendOnNewline(".class public \'" + className + "\'",
                 ".super java/lang/Object");
 
         for (int i = 0; i < n.vl.size(); i++) {
@@ -180,9 +180,9 @@ public class JVMVisitor {
 
         if (currFrame == null) {
             // if we don't have a frame, it's a field
-            access = currRecord.allocField(n.i.toString(), n.t);
+            access = currRecord.allocField("\'" + n.i.toString() + "\'", n.t);
         } else {
-            access = currFrame.allocLocal(n.i.toString(), n.t);
+            access = currFrame.allocLocal("\'" + n.i.toString() + "\'", n.t);
         }
 
         addAccess(n.i, access);
@@ -445,7 +445,7 @@ public class JVMVisitor {
 
     public String visit(NewObject n) {
         String type = n.i.s;
-        StringBuilder sb = appendOnNewline("new " + type, "dup",
+        StringBuilder sb = appendOnNewline("new \'" + type + "\'", "dup",
                 "invokespecial " + type + "/<init>()V");
         return sb.toString();
     }
