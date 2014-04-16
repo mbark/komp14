@@ -46,6 +46,7 @@ import syntaxtree.Program;
 import syntaxtree.This;
 import syntaxtree.Times;
 import syntaxtree.True;
+import syntaxtree.Type;
 import syntaxtree.VarDecl;
 import syntaxtree.VoidType;
 import syntaxtree.While;
@@ -115,18 +116,19 @@ public class JVMVisitor {
                 currMethod.getReturnType());
 
         String classDecl = ".class public " + className;
-        String inheritance = ".super java/lang/Object" + "\n";
+        String inheritance = ".super java/lang/Object";
 
         StringBuilder sb = appendOnNewline(classDecl, inheritance,
-                ".method public ()V", "aload_0",
-                "invokenonvirtual java/lang/Object/()V", "return",
+                ".method public <init>()V", "aload_0",
+                "invokespecial java/lang/Object/<init>()V", "return",
                 ".end method",
                 ".method public static main([Ljava/lang/String;)V");
 
-        int stackSize = 50; //currMethod.getNrOfLocals() + 1;
+        // TODO: hard coded values
+        int stackSize = 50;
         int locals = 50;
-        appendOnNewline(sb, ".limit stack " + stackSize,
-                ".limit locals " + locals);
+        appendOnNewline(sb, ".limit stack " + stackSize, ".limit locals "
+                + locals);
 
         for (int i = 0; i < n.vl.size(); i++) {
             sb.append(n.vl.elementAt(i).accept(this) + "\n");
@@ -150,20 +152,20 @@ public class JVMVisitor {
         String inheritance = ".super java/lang/Object" + "\n";
 
         StringBuilder sb = appendOnNewline(classDecl, inheritance,
-                ".method public ()V");
-        int stackSize = 50; //currClass.getNrOfFields() + 1;
-        int locals = 50;
-        appendOnNewline(sb, ".limit stack " + stackSize,
-                ".limit locals " + locals);
+                ".method public <init>()V");
 
-        appendOnNewline(sb, "alod 0",
+        appendOnNewline(sb, "aload 0",
                 "invokespecial java/lang/Object/<init>()V");
 
         for (int i = 0; i < n.vl.size(); i++) {
             appendOnNewline(sb, n.vl.elementAt(i).accept(this));
         }
 
-        appendOnNewline("return", ".end method");
+        appendOnNewline(sb, "return", ".end method");
+
+        for (int i = 0; i < n.ml.size(); i++) {
+            appendOnNewline(sb, n.ml.elementAt(i).accept(this));
+        }
 
         currRecord = null;
         currClass = null;
@@ -194,17 +196,38 @@ public class JVMVisitor {
         currFrame = factory.newFrame(currMethod.getId().toString(), n.fl,
                 currMethod.getReturnType());
 
-        StringBuilder sb = new StringBuilder();
+        String returnType = Hardware.signature(n.t);
+        StringBuilder sb = appendOnNewline(".method public " + n.i.s + "()"
+                + returnType);
+        // TODO: hard coded values
+        int stackSize = 50;
+        int locals = 50;
+        appendOnNewline(sb, ".limit stack " + stackSize, ".limit locals "
+                + locals);
 
         for (int i = 0; i < n.fl.size(); i++) {
-            String s = n.fl.elementAt(i).accept(this);
-            sb.append(s + "\n");
+            appendOnNewline(sb, n.fl.elementAt(i).accept(this));
         }
 
         for (int i = 0; i < n.vl.size(); i++) {
-            String s = n.vl.elementAt(i).accept(this);
-            sb.append(s + "\n");
+            appendOnNewline(sb, n.vl.elementAt(i).accept(this));
         }
+
+        for (int i = 0; i < n.sl.size(); i++) {
+            appendOnNewline(sb, n.sl.elementAt(i).accept(this));
+        }
+
+        appendOnNewline(sb, n.e.accept(this));
+
+        String returnCmd;
+        if (n.t instanceof IdentifierType) {
+            returnCmd = "areturn";
+        } else {
+            returnCmd = "ireturn";
+        }
+        appendOnNewline(sb, returnCmd);
+
+        appendOnNewline(sb, "return", ".end method");
 
         currFrame = null;
         currMethod = null;
@@ -253,11 +276,11 @@ public class JVMVisitor {
         String s1 = n.s1.accept(this);
         String s2 = n.s2.accept(this);
 
-        String notEquals = labels.newLabel("ne_lbl");
+        String notEquals = labels.newLabel("ne");
         String end = labels.newLabel("end");
 
-        StringBuilder sb = appendOnNewline(exp, "ifeq " + notEquals,
-                s1, "goto " + end, notEquals + ":", s2, end + ":");
+        StringBuilder sb = appendOnNewline(exp, "ifeq " + notEquals, s1,
+                "goto " + end, notEquals + ":", s2, end + ":");
 
         return sb.toString();
     }
@@ -298,19 +321,29 @@ public class JVMVisitor {
     }
 
     public String visit(And n) {
-        return "iand";
+        String left = n.e1.accept(this);
+        String right = n.e2.accept(this);
+
+        String trueLabel = labels.newLabel("true");
+        String end = labels.newLabel("end");
+
+        StringBuilder sb = appendOnNewline(left, "dup", "ifne " + trueLabel, "ldc "
+                + FALSE, "goto " + end, trueLabel + ":", right, end + ":");
+        appendOnNewline(sb, "iand");
+        return sb.toString();
     }
 
     public String visit(LessThan n) {
         String left = n.e1.accept(this);
         String right = n.e2.accept(this);
-        
+
         String greaterThan = labels.newLabel("gt");
         String end = labels.newLabel("end");
 
         StringBuilder sb = appendOnNewline(right, left);
         appendOnNewline(sb, "if_icmplt " + greaterThan);
-        appendOnNewline(sb, "iconst_1", "goto " + end, greaterThan + ":", "iconst_0", end + ":");
+        appendOnNewline(sb, "iconst_1", "goto " + end, greaterThan + ":",
+                "iconst_0", end + ":");
 
         return sb.toString();
     }
@@ -370,9 +403,10 @@ public class JVMVisitor {
 
         IdentifierType t = (IdentifierType) n.e.getType();
         String className = t.s;
+        String returnType = Hardware.signature(n.getType());
 
         String methodCall = "invokevirtual " + className + "/" + n.i.s + "("
-                + paramTypes.toString() + ")";
+                + paramTypes.toString() + ")" + returnType;
         appendOnNewline(sb, methodCall);
 
         return sb.toString();
@@ -409,7 +443,9 @@ public class JVMVisitor {
 
     public String visit(NewObject n) {
         String type = n.i.s;
-        return "invokespecial " + type + "/<init>()V";
+        StringBuilder sb = appendOnNewline("new " + type, "dup",
+                "invokespecial " + type + "/<init>()V");
+        return sb.toString();
     }
 
     public String visit(Not n) {

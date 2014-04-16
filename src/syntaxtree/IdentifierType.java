@@ -58,6 +58,6 @@ public class IdentifierType extends Type {
 
     @Override
     public String toString() {
-        return this.getClass().getName() + "(" + this.s + ")";
+        return s;
     }
 }
