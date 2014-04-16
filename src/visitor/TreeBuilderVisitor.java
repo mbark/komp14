@@ -229,7 +229,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
     @Override
     public Stm visit(Assign n) {
         AbstractExp value = n.e.accept(this);
-        AbstractExp var = n.i.accept(this);
+        AbstractExp var = expForId.get(n.i.s);
 
         return new MOVE(var, value);
     }
@@ -477,8 +477,7 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
     @Override
     public AbstractExp visit(IdentifierExp n) {
-        // TODO: temporary code
-        return new TEMP(new Temp());
+        return expForId.get(n.s);
     }
 
     @Override
