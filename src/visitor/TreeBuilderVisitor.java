@@ -53,6 +53,7 @@ import tree.BINOP;
 import tree.CALL;
 import tree.CJUMP;
 import tree.CONST;
+import tree.EXP;
 import tree.ExpList;
 import tree.JUMP;
 import tree.LABEL;
@@ -179,7 +180,11 @@ public class TreeBuilderVisitor implements TreeVisitor {
 
     @Override
     public Stm visit(Block n) {
-        return visit(n.sl);
+        if (n.sl.size() > 0) {
+            return visit(n.sl);
+        } else {
+            return nop();
+        }
     }
 
     @Override
@@ -464,6 +469,10 @@ public class TreeBuilderVisitor implements TreeVisitor {
         } else {
             return seq;
         }
+    }
+
+    private Stm nop() {
+        return new EXP(new CONST(0));
     }
 
     @Override
