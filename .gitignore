@@ -1,12 +1,7 @@
-*.aux
 *.class
-*.ear
 *.jar
-*.log
-*.out
-*.s
 *.pdf
-*.war
+*.s
 DESC
 bin/
 src/mjc/*.java
