@@ -1,10 +1,13 @@
 package jvm;
 
 public class IntegerInFrame implements frame.VMAccess {
+    private String escapedName;
+    
     public IntegerInFrame(String name, int offset, String signature) {
         n = name;
         o = offset;
         s = signature;
+        escapedName = "\'" + n + "\'";
     }
 
     public String toString() {
@@ -12,36 +15,36 @@ public class IntegerInFrame implements frame.VMAccess {
     }
 
     public String declare() {
-        return ".var " + o + " is " + n + " " + s;
+        return ".var " + o + " is " + escapedName + " " + s;
     }
 
     public String load() {
         switch (o) {
         case 0:
-            return "    iload_0 ; " + n;
+            return "    iload_0 ; " + escapedName;
         case 1:
-            return "    iload_1 ; " + n;
+            return "    iload_1 ; " + escapedName;
         case 2:
-            return "    iload_2 ; " + n;
+            return "    iload_2 ; " + escapedName;
         case 3:
-            return "    iload_3 ; " + n;
+            return "    iload_3 ; " + escapedName;
         default:
-            return "    iload " + o + " ; " + n;
+            return "    iload " + o + " ; " + escapedName;
         }
     }
 
     public String store() {
         switch (o) {
         case 0:
-            return "    istore_0 ; " + n;
+            return "    istore_0 ; " + escapedName;
         case 1:
-            return "    istore_1 ; " + n;
+            return "    istore_1 ; " + escapedName;
         case 2:
-            return "    istore_2 ; " + n;
+            return "    istore_2 ; " + escapedName;
         case 3:
-            return "    istore_3 ; " + n;
+            return "    istore_3 ; " + escapedName;
         default:
-            return "    istore " + o + " ; " + n;
+            return "    istore " + o + " ; " + escapedName;
         }
     }
 

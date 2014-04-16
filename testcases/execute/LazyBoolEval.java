@@ -3,7 +3,7 @@ class LazyBoolEval {
 		boolean b;
 		Other o;
 		o = new Other();
-		b = o.doA() && o.doB();
+		b = o.doB() && o.doA() && o.doB() && o.doB() && o.doB() && o.doB();
 	}
 }
 
@@ -15,6 +15,6 @@ class Other {
 
 	public boolean doB() {
 		System.out.println(2);
-		return false;
+		return true;
 	}
 }

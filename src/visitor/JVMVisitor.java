@@ -180,9 +180,9 @@ public class JVMVisitor {
 
         if (currFrame == null) {
             // if we don't have a frame, it's a field
-            access = currRecord.allocField("\'" + n.i.toString() + "\'", n.t);
+            access = currRecord.allocField(n.i.toString(), n.t);
         } else {
-            access = currFrame.allocLocal("\'" + n.i.toString() + "\'", n.t);
+            access = currFrame.allocLocal(n.i.toString(), n.t);
         }
 
         addAccess(n.i, access);

@@ -5,9 +5,17 @@ class EvilNames {
 }
 
 class istore {
+	int lcmp;
 	int fstore;
 
-	public int ifeq() {
-		return 3;
+	public istore ifeq(istore invokespecial) {
+		istore i;
+		i = new istore();
+
+		return invokespecial;
 	}
+}
+
+class lcmp {
+	int lcmp;
 }
