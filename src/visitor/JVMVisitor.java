@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 
 import jvm.Hardware;
+import jvm.LabelTable;
 import symbol.ClassTable;
 import symbol.MethodTable;
 import symbol.ProgramTable;
@@ -62,6 +63,7 @@ public class JVMVisitor {
     private VMFrame currFrame;
 
     private HashMap<Identifier, VMAccess> accesses;
+    private LabelTable labels;
 
     private static final int FALSE = 0;
     private static final int TRUE = 1;
@@ -76,6 +78,7 @@ public class JVMVisitor {
         currFrame = null;
 
         accesses = new HashMap<>();
+        labels = new LabelTable();
     }
 
     public String visit(Program n) {
@@ -120,8 +123,10 @@ public class JVMVisitor {
                 ".end method",
                 ".method public static main([Ljava/lang/String;)V");
 
-        int stackSize = currMethod.getNrOfLocals() + 1;
-        appendOnNewline(sb, ".limit stack " + stackSize);
+        int stackSize = 50; //currMethod.getNrOfLocals() + 1;
+        int locals = 50;
+        appendOnNewline(sb, ".limit stack " + stackSize,
+                ".limit locals " + locals);
 
         for (int i = 0; i < n.vl.size(); i++) {
             sb.append(n.vl.elementAt(i).accept(this) + "\n");
@@ -146,8 +151,10 @@ public class JVMVisitor {
 
         StringBuilder sb = appendOnNewline(classDecl, inheritance,
                 ".method public ()V");
-        int stackSize = currClass.getNrOfFields() + 1;
-        appendOnNewline(sb, ".limit stack " + stackSize);
+        int stackSize = 50; //currClass.getNrOfFields() + 1;
+        int locals = 50;
+        appendOnNewline(sb, ".limit stack " + stackSize,
+                ".limit locals " + locals);
 
         appendOnNewline(sb, "alod 0",
                 "invokespecial java/lang/Object/<init>()V");
@@ -246,11 +253,11 @@ public class JVMVisitor {
         String s1 = n.s1.accept(this);
         String s2 = n.s2.accept(this);
 
-        // TODO: Labels must be unique (I think)
-        String lbl = "STATEMENT_2";
+        String notEquals = labels.newLabel("ne_lbl");
+        String end = labels.newLabel("end");
 
-        StringBuilder sb = appendOnNewline(exp, "ldc " + TRUE, "ifne " + lbl,
-                s1, lbl + ":", s2);
+        StringBuilder sb = appendOnNewline(exp, "ifeq " + notEquals,
+                s1, "goto " + end, notEquals + ":", s2, end + ":");
 
         return sb.toString();
     }
@@ -259,9 +266,8 @@ public class JVMVisitor {
         String exp = n.e.accept(this);
         String s = n.s.accept(this);
 
-        // TODO: Labels must be unique (I think)
-        String whileLabel = "while";
-        String doneLabel = "done";
+        String whileLabel = labels.newLabel("while");
+        String doneLabel = labels.newLabel("done");
 
         StringBuilder sb = appendOnNewline(whileLabel + ":", exp,
                 "ldc " + TRUE, "ifne " + doneLabel, s, "goto " + whileLabel,
@@ -287,7 +293,7 @@ public class JVMVisitor {
     }
 
     public String visit(ArrayAssign n) {
-        // TODO Auto-generated method stub
+        // TODO Implement this :o
         return null;
     }
 
@@ -298,18 +304,15 @@ public class JVMVisitor {
     public String visit(LessThan n) {
         String left = n.e1.accept(this);
         String right = n.e2.accept(this);
+        
+        String greaterThan = labels.newLabel("gt");
+        String end = labels.newLabel("end");
 
-        int offset = 0;
+        StringBuilder sb = appendOnNewline(right, left);
+        appendOnNewline(sb, "if_icmplt " + greaterThan);
+        appendOnNewline(sb, "iconst_1", "goto " + end, greaterThan + ":", "iconst_0", end + ":");
 
-        String s = left + "\n" + right;
-        s += "\n" + "if_icmpge " + offset;
-
-        s += "\n" + "iconst_1";
-        s += "\n" + "goto " + (offset + 1);
-        s += "\n" + "iconst_0";
-        s += "\n" + "istore_3";
-
-        return s;
+        return sb.toString();
     }
 
     public String visit(Plus n) {
