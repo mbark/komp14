@@ -148,18 +148,17 @@ public class JVMVisitor {
         String className = currClass.getId().toString();
         currRecord = factory.newRecord(className);
 
-        String classDecl = ".class public " + className;
-        String inheritance = ".super java/lang/Object" + "\n";
-
-        StringBuilder sb = appendOnNewline(classDecl, inheritance,
-                ".method public <init>()V");
-
-        appendOnNewline(sb, "aload 0",
-                "invokespecial java/lang/Object/<init>()V");
+        StringBuilder sb = appendOnNewline(".class public " + className,
+                ".super java/lang/Object");
 
         for (int i = 0; i < n.vl.size(); i++) {
             appendOnNewline(sb, n.vl.elementAt(i).accept(this));
         }
+
+        appendOnNewline(sb, ".method public <init>()V");
+
+        appendOnNewline(sb, "aload 0",
+                "invokespecial java/lang/Object/<init>()V");
 
         appendOnNewline(sb, "return", ".end method");
 
@@ -316,8 +315,13 @@ public class JVMVisitor {
     }
 
     public String visit(ArrayAssign n) {
-        // TODO Implement this :o
-        return null;
+        VMAccess access = getAccess(n.i);
+        String index = n.e1.accept(this);
+        String value = n.e2.accept(this);
+        
+        StringBuilder sb = appendOnNewline(access.load(), index, value, "iastore");
+        
+        return sb.toString();
     }
 
     public String visit(And n) {
@@ -327,8 +331,9 @@ public class JVMVisitor {
         String trueLabel = labels.newLabel("true");
         String end = labels.newLabel("end");
 
-        StringBuilder sb = appendOnNewline(left, "dup", "ifne " + trueLabel, "ldc "
-                + FALSE, "goto " + end, trueLabel + ":", right, end + ":");
+        StringBuilder sb = appendOnNewline(left, "dup", "ifne " + trueLabel,
+                "ldc " + FALSE, "goto " + end, trueLabel + ":", right, end
+                        + ":");
         appendOnNewline(sb, "iand");
         return sb.toString();
     }
@@ -382,9 +387,7 @@ public class JVMVisitor {
 
     public String visit(ArrayLength n) {
         String array = n.e.accept(this);
-        // TODO: is this the right way? It's a bit hacky
-        StringBuilder sb = appendOnNewline(array,
-                "invokestatic java/lang/reflect/Array/getLength([java/lang/Object)");
+        StringBuilder sb = appendOnNewline(array, "arraylength");
         return sb.toString();
     }
 
@@ -436,7 +439,7 @@ public class JVMVisitor {
 
     public String visit(NewArray n) {
         String size = n.e.accept(this);
-        StringBuilder sb = appendOnNewline("ldc " + size, "newarray int");
+        StringBuilder sb = appendOnNewline(size, "newarray int");
 
         return sb.toString();
     }
