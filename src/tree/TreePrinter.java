@@ -248,6 +248,7 @@ public class TreePrinter {
         } else if (e instanceof CALL) {
             prExp((CALL) e, d);
         } else {
+            indent(d);
             say("null");
 //            throw new Error("Print.prExp " + " for " + e + " with d = " + d);
         }
