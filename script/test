@@ -8,17 +8,49 @@ java_classpath=$compdir/mjc.jar:$compdir/lib/javacc.jar
 
 for program in `find $compdir/testcases/compile -name '*.java'`; do
     java -cp $java_classpath mjc.JVMMain "$program" -S > "$scratch" 2>&1
-    if [ $? -gt 0 ]; then
-        echo "ERROR: False negative for \"$program\""
+    if [ $? -ne 0 ]; then
+        echo "Compilation error: False negative for \"$program\""
         cat "$scratch"
     fi
 done
 
 for program in `find $compdir/testcases/noncompile -name '*.java'`; do
     java -cp $java_classpath mjc.JVMMain "$program" -S > "$scratch" 2>&1
-    if [ $? -lt 1 ]; then
-        echo "ERROR: False positive for \"$program\""
+    if [ $? -eq 0 ]; then
+        echo "Compilation error: False positive for \"$program\""
         cat "$scratch"
+    fi
+done
+
+for program in `find $compdir/testcases/execute -name '*.java'`; do
+    rm -f $compdir/*.s
+
+    java -cp $java_classpath mjc.JVMMain "$program" -S > "$scratch" 2>&1
+    if [ $? -ne 0 ]; then
+        echo "Compilation error: False negative for \"$program\""
+        cat "$scratch"
+        continue
+    fi
+
+    java -jar $compdir/lib/jasmin.jar $compdir/*.s > /dev/null 2> "$scratch"
+    if [ -s "$scratch" ]; then
+        echo "Jasmin error: False negative for \"$program\""
+        cat "$scratch"
+        continue
+    fi
+
+    java_mainclass="`basename -s.java $program`"
+    java -cp $compdir $java_mainclass > "$scratch" 2>&1
+    if [ $? -ne 0 ]; then
+        echo "Execution error: False negative for \"$program\""
+        cat "$scratch"
+        continue
+    fi
+
+    reference="${program%.java}.out"
+    if ! diff "$reference" "$scratch" > /dev/null 2>&1; then
+        echo "Output error: False negative for \"$program\""
+        diff "$reference" "$scratch"
     fi
 done
 

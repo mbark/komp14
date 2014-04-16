@@ -6,9 +6,9 @@ class MethodCallOrdering {
     	o = new Other();
 
     	a = o.init();
-    	b = doA() && doB();
+    	b = o.doA() && o.doB();
 
-    	System.out.println(getA());
+    	System.out.println(o.getA());
     }
 }
 

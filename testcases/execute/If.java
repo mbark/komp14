@@ -17,11 +17,5 @@ class If {
 		} else {
 			System.out.println(2);
 		}
-
-		if(false || false) {
-			System.out.println(1);
-		} else {
-			System.out.println(2);
-		}
 	}
 }
