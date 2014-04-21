@@ -195,7 +195,12 @@ public class JVMVisitor {
                 currMethod.getReturnType());
 
         String returnType = Hardware.signature(n.t);
-        StringBuilder sb = appendOnNewline(".method public " + n.i.s + "()"
+        StringBuilder params = new StringBuilder();
+        for(int i = 0; i<n.fl.size(); i++) {
+            String signature = Hardware.signature(n.fl.elementAt(i).t);
+            params.append(signature);
+        }
+        StringBuilder sb = appendOnNewline(".method public " + n.i.s + "(" + params.toString() + ")"
                 + returnType);
         // TODO: hard coded values
         int stackSize = 50;
@@ -203,8 +208,12 @@ public class JVMVisitor {
         appendOnNewline(sb, ".limit stack " + stackSize, ".limit locals "
                 + locals);
 
+//        allocate one spot for this
+        currFrame.allocFormal("this", new IdentifierType(""));
+        
         for (int i = 0; i < n.fl.size(); i++) {
-            appendOnNewline(sb, n.fl.elementAt(i).accept(this));
+            String loadType = n.fl.elementAt(i).t instanceof IdentifierType ? "aload" : "iload";
+            appendOnNewline(sb, loadType + " " + (i+1), n.fl.elementAt(i).accept(this));
         }
 
         for (int i = 0; i < n.vl.size(); i++) {
