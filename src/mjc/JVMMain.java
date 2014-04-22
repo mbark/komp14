@@ -11,11 +11,7 @@ import java.util.List;
 import symbol.ProgramTable;
 import syntaxtree.Program;
 import syntaxtree.SyntaxTreePrinter;
-import tree.Stm;
-import tree.TreePrinter;
-import tree.TreeViewer;
 import visitor.JVMVisitor;
-import visitor.TreeBuilderVisitor;
 import visitor.TypeCheckVisitor;
 import visitor.TypeDefVisitor;
 import error.ErrorMsg;
@@ -112,23 +108,6 @@ public class JVMMain {
         // Print symbol table
         if (options.printSymbolTable) {
             System.err.println(pt);
-        }
-
-        // Build IR
-        frame.Factory factory = new sparc.Factory();
-        TreeBuilderVisitor treeBuilder = new TreeBuilderVisitor(pt, factory);
-        Stm stm = treeBuilder.visit(p);
-
-        // Print IR
-        if (options.printIntermediateRepresentation) {
-            new TreePrinter(System.err).prStm(stm);
-        }
-
-        // View IR
-        if (options.viewIntermediateRepresentation) {
-            TreeViewer viewer = new TreeViewer(sourceFile.getName());
-            viewer.addStm(stm);
-            viewer.expandTree();
         }
 
         // Generate and write assembly

@@ -184,9 +184,11 @@ public class JVMVisitor {
         String className = currClass.getId().toString();
         currRecord = factory.newRecord(className);
         fields = new HashMap<>();
+        String superClass = currClass.getSuperClass().toString();
 
         StringBuilder sb = appendOnNewline(".class public \'" + className + "\'",
-                ".super " + className);
+                ".super " + superClass);
+        
 
         for (int i = 0; i < n.vl.size(); i++) {
             appendOnNewline(sb, n.vl.elementAt(i).accept(this));
@@ -195,7 +197,7 @@ public class JVMVisitor {
         appendOnNewline(sb, ".method public <init>()V");
 
         appendOnNewline(sb, "aload 0",
-                "invokespecial " + className + "/<init>()V");
+                "invokespecial " + superClass + "/<init>()V");
 
         appendOnNewline(sb, "return", ".end method");
 
