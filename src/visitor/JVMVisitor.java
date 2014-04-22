@@ -212,7 +212,16 @@ public class JVMVisitor {
         currFrame.allocFormal("this", new IdentifierType(""));
         
         for (int i = 0; i < n.fl.size(); i++) {
-            String loadType = n.fl.elementAt(i).t instanceof IdentifierType ? "aload" : "iload";
+            Formal f = n.fl.elementAt(i);
+            String loadType;
+            
+            if(f.t instanceof IdentifierType) {
+                loadType = "aload";
+            } else if(f.t instanceof IntArrayType) {
+                loadType = "aload";
+            } else {
+                loadType = "iload";
+            }
             appendOnNewline(sb, loadType + " " + (i+1), n.fl.elementAt(i).accept(this));
         }
 
