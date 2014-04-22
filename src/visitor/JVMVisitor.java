@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 
+import com.sun.org.apache.xalan.internal.xsltc.util.IntegerArray;
+
 import jvm.Hardware;
 import jvm.LabelTable;
 import symbol.ClassTable;
@@ -226,10 +228,10 @@ public class JVMVisitor {
         appendOnNewline(sb, n.e.accept(this));
 
         String returnCmd;
-        if (n.t instanceof IntegerType) {
-            returnCmd = "ireturn";
-        } else {
+        if (n.t instanceof IdentifierType || n.t instanceof IntArrayType) {
             returnCmd = "areturn";
+        } else {
+            returnCmd = "ireturn";
         }
         appendOnNewline(sb, returnCmd);
 
