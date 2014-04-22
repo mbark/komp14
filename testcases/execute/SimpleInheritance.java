@@ -6,6 +6,8 @@ class SimpleInheritance {
         C c;
         c = new C();
         System.out.println(c.foo());
+        System.out.println(c.bar());
+        System.out.println(c.baz());
     }
 }
 
