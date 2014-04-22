@@ -29,11 +29,11 @@ public class MethodTable {
     public Type getReturnType() {
         return returnType;
     }
-    
+
     public int getNrOfParams() {
         return params.size();
     }
-    
+
     public int getNrOfLocals() {
         return locals.size();
     }
@@ -49,12 +49,17 @@ public class MethodTable {
     }
 
     private static final class Param {
-        Symbol key;
-        Type type;
+        public Symbol key;
+        public Type type;
 
         private Param(Symbol key, Type value) {
             this.key = key;
             this.type = value;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%s<%s>", key, type);
         }
     }
 

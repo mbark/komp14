@@ -173,6 +173,13 @@ public class TypeCheckVisitor implements TypeVisitor {
 
     @Override
     public Type visit(Formal n) {
+        if (n.t instanceof IdentifierType) {
+            IdentifierType it = (IdentifierType) n.t;
+            if (currProgram.get(Symbol.symbol(it.s)) == null) {
+                error.complain("Undefined type " + n.t + " for formal");
+            }
+        }
+
         return n.t;
     }
 

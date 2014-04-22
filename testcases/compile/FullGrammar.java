@@ -1,7 +1,7 @@
 /**
  * Test case intended to exercise all grammar constructs.
  */
-class Main {
+class FullGrammar {
     public static void main(String[] args) {
         Aux aux;
         int[] a;
