@@ -1,5 +1,5 @@
-class Main {
+class NoTypeDeclared {
     public static void main(String[] args) {
-    	args = 1;
+        i = 3;
     }
 }

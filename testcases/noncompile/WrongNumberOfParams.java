@@ -1,7 +1,7 @@
-class Bogus5 {
+class WrongNumberOfParams {
     public static void main(String[] args) {
         int a;
-        a = (new A()).A(1); // fel antal params
+        a = (new A()).A(1);
     }
 }
 

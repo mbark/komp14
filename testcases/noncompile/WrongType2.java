@@ -1,6 +1,5 @@
-class Main {
+class WrongType2 {
     public static void main(String[] args) {
-    	Main m;
-    	m = 3;
+        args[0] = 1;
     }
 }

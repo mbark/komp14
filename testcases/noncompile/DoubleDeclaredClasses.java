@@ -1,15 +1,10 @@
-class Main {
+class DoubleDeclaredClasses {
     public static void main(String[] args) {
-
     }
 }
 
-class Foo {
-	public int foo() {
-    	return 1;
-    }
-
+class DoubleDeclaredClasses {
     public int foo() {
-    	return 2;
+        return 1;
     }
 }

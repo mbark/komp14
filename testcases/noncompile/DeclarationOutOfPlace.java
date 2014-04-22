@@ -1,6 +1,5 @@
-class Main {
+class DeclarationOutOfPlace {
     public static void main(String[] args) {
-
     }
 }
 
@@ -13,7 +12,7 @@ class Foo {
         }
 
         int bar;
-        
+
         return 2;
     }
 }
