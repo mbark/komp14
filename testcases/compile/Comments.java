@@ -3,7 +3,7 @@
  *
  * @author Martin Barksten & Victor Koronen
  */
-class Foo {
+class Comments {
     /**
      * More JavaDoc.
      */

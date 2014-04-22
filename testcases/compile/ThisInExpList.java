@@ -1,4 +1,4 @@
-class MethodCall {
+class ThisInExpList {
     public static void main(String[] args) {
         OtherClass c;
         int i;
@@ -8,7 +8,11 @@ class MethodCall {
 }
 
 class OtherClass {
-    public int foo() {
+    public int bar(OtherClass o) {
         return 1;
+    }
+
+    public int foo() {
+        return this.bar(this);
     }
 }
