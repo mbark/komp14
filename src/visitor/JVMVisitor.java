@@ -180,7 +180,34 @@ public class JVMVisitor {
     }
 
     public String visit(ClassDeclExtends n) {
-        throw new UnsupportedOperationException();
+        currClass = currProgram.get(convertToSymbol(n.i));
+        String className = currClass.getId().toString();
+        currRecord = factory.newRecord(className);
+        fields = new HashMap<>();
+
+        StringBuilder sb = appendOnNewline(".class public \'" + className + "\'",
+                ".super " + className);
+
+        for (int i = 0; i < n.vl.size(); i++) {
+            appendOnNewline(sb, n.vl.elementAt(i).accept(this));
+        }
+
+        appendOnNewline(sb, ".method public <init>()V");
+
+        appendOnNewline(sb, "aload 0",
+                "invokespecial " + className + "/<init>()V");
+
+        appendOnNewline(sb, "return", ".end method");
+
+        for (int i = 0; i < n.ml.size(); i++) {
+            appendOnNewline(sb, n.ml.elementAt(i).accept(this));
+        }
+
+        fields = null;
+        currRecord = null;
+        currClass = null;
+
+        return sb.toString();
     }
 
     public String visit(VarDecl n) {

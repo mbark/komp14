@@ -127,8 +127,20 @@ public class TypeCheckVisitor implements TypeVisitor {
 
     @Override
     public Type visit(ClassDeclExtends n) {
-        // TODO: fix
-        return null;
+        currClass = currProgram.get(convertToSymbol(n.i));
+//        TODO: type check the super class
+
+        for (int i = 0; i < n.vl.size(); i++) {
+            n.vl.elementAt(i).accept(this);
+        }
+
+        for (int i = 0; i < n.ml.size(); i++) {
+            n.ml.elementAt(i).accept(this);
+        }
+
+        currClass = null;
+        // TODO: other type?
+        return new VoidType();
     }
 
     @Override
