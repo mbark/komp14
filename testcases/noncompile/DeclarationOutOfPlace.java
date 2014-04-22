@@ -8,7 +8,7 @@ class Foo {
         int args;
 
         while(true) {
-            System.out.println("foo");
+            System.out.println(0);
         }
 
         int bar;
