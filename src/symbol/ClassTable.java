@@ -9,6 +9,7 @@ public class ClassTable {
     private Symbol id;
     private HashMap<Symbol, Type> fields;
     private HashMap<Symbol, MethodTable> methods;
+    private Symbol superClass;
 
     public ClassTable(Symbol id) {
         this.id = id;
@@ -20,9 +21,17 @@ public class ClassTable {
     public Symbol getId() {
         return id;
     }
-    
+
     public int getNrOfFields() {
-        return fields.size(); 
+        return fields.size();
+    }
+
+    public void setSuperClass(Symbol name) {
+        superClass = name;
+    }
+
+    public Symbol getSuperClass() {
+        return superClass;
     }
 
     public boolean put(Symbol key, MethodTable value) {

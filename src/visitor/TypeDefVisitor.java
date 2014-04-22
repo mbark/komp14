@@ -44,7 +44,7 @@ public class TypeDefVisitor extends AbstractTypeDefVisitor {
     public void visit(MainClass n) {
         currClass = new ClassTable(convertToSymbol(n.i1));
         currMethod = new MethodTable(Symbol.symbol("main"), new VoidType());
-//        We can ignore the String[] args param, its use is undefined
+        // We can ignore the String[] args param, its use is undefined
 
         super.visit(n);
 
@@ -63,7 +63,12 @@ public class TypeDefVisitor extends AbstractTypeDefVisitor {
 
     @Override
     public void visit(ClassDeclExtends n) {
-        throw new UnsupportedOperationException("Not implemented yet!");
+        currClass = new ClassTable(convertToSymbol(n.i));
+        currClass.setSuperClass(convertToSymbol(n.i));
+
+        super.visit(n);
+
+        addClassToProgram();
     }
 
     @Override

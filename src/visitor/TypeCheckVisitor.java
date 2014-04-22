@@ -1,5 +1,7 @@
 package visitor;
 
+import java.util.HashSet;
+
 import symbol.ClassTable;
 import symbol.MethodTable;
 import symbol.ProgramTable;
@@ -12,6 +14,7 @@ import syntaxtree.Assign;
 import syntaxtree.Block;
 import syntaxtree.BooleanType;
 import syntaxtree.Call;
+import syntaxtree.ClassDecl;
 import syntaxtree.ClassDeclExtends;
 import syntaxtree.ClassDeclSimple;
 import syntaxtree.False;
@@ -63,8 +66,10 @@ public class TypeCheckVisitor implements TypeVisitor {
             }
         }
 
-        if (type == null && currClass != null) {
-            type = currClass.getField(var);
+        ClassTable klass = currClass;
+        while (type == null && klass != null) {
+            type = klass.getField(var);
+            klass = currProgram.get(klass.getSuperClass());
         }
 
         return type;
@@ -83,6 +88,20 @@ public class TypeCheckVisitor implements TypeVisitor {
 
     @Override
     public Type visit(Program n) {
+        for (int i = 0; i < n.cl.size(); i++) {
+            ClassDecl cl = n.cl.elementAt(i);
+            if (cl instanceof ClassDeclExtends) {
+                ClassDeclExtends cdl = (ClassDeclExtends) cl;
+                ClassTable ct = currProgram.get(convertToSymbol(cdl.i));
+
+                if (hasCircularDependency(ct)) {
+                    error.complain("Class " + cl.getName()
+                            + " has a circular dependencies.");
+                    return new VoidType();
+                }
+            }
+        }
+
         n.m.accept(this);
         for (int i = 0; i < n.cl.size(); i++) {
             n.cl.elementAt(i).accept(this);
@@ -90,6 +109,21 @@ public class TypeCheckVisitor implements TypeVisitor {
 
         // TODO: other type?
         return new VoidType();
+    }
+
+    public boolean hasCircularDependency(ClassTable superClass) {
+        HashSet<ClassTable> visited = new HashSet<>();
+
+        do {
+            if (visited.contains(superClass)) {
+                return true;
+            }
+
+            visited.add(superClass);
+            superClass = currProgram.get(superClass.getSuperClass());
+        } while (superClass != null);
+
+        return false;
     }
 
     @Override
@@ -128,7 +162,6 @@ public class TypeCheckVisitor implements TypeVisitor {
     @Override
     public Type visit(ClassDeclExtends n) {
         currClass = currProgram.get(convertToSymbol(n.i));
-//        TODO: type check the super class
 
         for (int i = 0; i < n.vl.size(); i++) {
             n.vl.elementAt(i).accept(this);
