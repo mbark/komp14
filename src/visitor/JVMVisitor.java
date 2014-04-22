@@ -62,7 +62,9 @@ public class JVMVisitor {
     private VMRecord currRecord;
     private VMFrame currFrame;
 
-    private HashMap<Identifier, VMAccess> accesses;
+    private HashMap<Identifier, VMAccess> locals;
+    private HashMap<Identifier, VMAccess> fields;
+    
     private LabelTable labels;
 
     private static final int FALSE = 0;
@@ -77,7 +79,6 @@ public class JVMVisitor {
         currRecord = null;
         currFrame = null;
 
-        accesses = new HashMap<>();
         labels = new LabelTable();
     }
 
@@ -113,6 +114,9 @@ public class JVMVisitor {
         currMethod = currClass.getMethod(Symbol.symbol("main"));
         currFrame = factory.newFrame("main", new FormalList(),
                 currMethod.getReturnType());
+        
+        fields = new HashMap<>();
+        locals = new HashMap<>();
 
         String classDecl = ".class public \'" + className + "\'";
         String inheritance = ".super java/lang/Object";
@@ -125,9 +129,9 @@ public class JVMVisitor {
 
         // TODO: hard coded values
         int stackSize = 50;
-        int locals = 50;
+        int nrOflocals = 50;
         appendOnNewline(sb, ".limit stack " + stackSize, ".limit locals "
-                + locals);
+                + nrOflocals);
 
         for (int i = 0; i < n.vl.size(); i++) {
             sb.append(n.vl.elementAt(i).accept(this) + "\n");
@@ -136,6 +140,8 @@ public class JVMVisitor {
 
         appendOnNewline(sb, "return", ".end method");
 
+        fields = null;
+        locals = null;
         currFrame = null;
         currRecord = null;
         currClass = null;
@@ -146,6 +152,7 @@ public class JVMVisitor {
         currClass = currProgram.get(convertToSymbol(n.i));
         String className = currClass.getId().toString();
         currRecord = factory.newRecord(className);
+        fields = new HashMap<>();
 
         StringBuilder sb = appendOnNewline(".class public \'" + className + "\'",
                 ".super java/lang/Object");
@@ -165,6 +172,7 @@ public class JVMVisitor {
             appendOnNewline(sb, n.ml.elementAt(i).accept(this));
         }
 
+        fields = null;
         currRecord = null;
         currClass = null;
 
@@ -181,11 +189,12 @@ public class JVMVisitor {
         if (currFrame == null) {
             // if we don't have a frame, it's a field
             access = currRecord.allocField(n.i.toString(), n.t);
+            addFieldAccess(n.i, access);
         } else {
             access = currFrame.allocLocal(n.i.toString(), n.t);
+            addLocalAccess(n.i, access);
         }
 
-        addAccess(n.i, access);
         return access.declare();
     }
 
@@ -193,6 +202,7 @@ public class JVMVisitor {
         currMethod = currClass.getMethod(convertToSymbol(n.i));
         currFrame = factory.newFrame(currMethod.getId().toString(), n.fl,
                 currMethod.getReturnType());
+        locals = new HashMap<>();
 
         String returnType = Hardware.signature(n.t);
         StringBuilder params = new StringBuilder();
@@ -204,9 +214,9 @@ public class JVMVisitor {
                 + returnType);
         // TODO: hard coded values
         int stackSize = 50;
-        int locals = 50;
+        int nrOfLocals = 50;
         appendOnNewline(sb, ".limit stack " + stackSize, ".limit locals "
-                + locals);
+                + nrOfLocals);
 
 //        allocate one spot for this
         currFrame.allocFormal("this", new IdentifierType(""));
@@ -235,6 +245,7 @@ public class JVMVisitor {
 
         appendOnNewline(sb, "return", ".end method");
 
+        locals = null;
         currFrame = null;
         currMethod = null;
 
@@ -243,7 +254,7 @@ public class JVMVisitor {
 
     public String visit(Formal n) {
         VMAccess access = currFrame.allocFormal(n.i.toString(), n.t);
-        addAccess(n.i, access);
+        addLocalAccess(n.i, access);
         StringBuilder sb = appendOnNewline(access.load(), access.store());
 
         return sb.toString();
@@ -407,7 +418,6 @@ public class JVMVisitor {
             appendOnNewline(sb, exp.accept(this));
 
             String type = Hardware.signature(exp.getType());
-            // TODO: is there some separator between them?
             paramTypes.append(type);
         }
 
@@ -440,7 +450,6 @@ public class JVMVisitor {
     }
 
     public String visit(This n) {
-        // TODO: I think this is how you do it
         return "aload_0";
     }
 
@@ -477,13 +486,22 @@ public class JVMVisitor {
     private static Symbol convertToSymbol(Identifier i) {
         return Symbol.symbol(i.toString());
     }
-
-    private void addAccess(Identifier i, VMAccess a) {
-        accesses.put(i, a);
+    
+    private void addFieldAccess(Identifier i, VMAccess a) {
+        fields.put(i, a);
+    }
+    
+    private void addLocalAccess(Identifier i, VMAccess a) {
+        locals.put(i, a);
     }
 
     private VMAccess getAccess(Identifier i) {
-        return accesses.get(i);
+        VMAccess a = locals.get(i);
+        if(a == null) {
+            a = fields.get(i);
+        }
+        
+        return a;
     }
 
     private StringBuilder appendOnNewline(String... s) {
