@@ -5,18 +5,18 @@
 
 \usepackage{hyperref}
 \hypersetup{%
-    pdfauthor = {Victor Koronen, Martin Barksten},
-    pdftitle = {Kompilatorkonstruktion},
+    pdfauthor = {Martin Barksten, Victor Koronen},
+    pdftitle = {Compiler Construction},
     pdfsubject = {DD2488},
     pdfkeywords = {compiler},
     pdfcreator = {LaTeX with hyperref package},
     pdfproducer = {pdflatex}
 }
 
-\title{Kompilatorkonstruktion}
+\title{Compiler Construction}
 \author{%
-    Victor Koronen <\href{mailto:koronen@kth.se}{koronen@kth.se}> \and
-    Martin Barksten <\href{mailto:barksten@kth.se}{barksten@kth.se}>
+    Martin Barksten <\href{mailto:barksten@kth.se}{barksten@kth.se}> \and
+    Victor Koronen <\href{mailto:koronen@kth.se}{koronen@kth.se}>
 }
 \date{\today}
 
@@ -25,8 +25,25 @@
 \maketitle
 \thispagestyle{empty}
 
-\section{Introduktion}
+\section{Introduction}
 
-Foobar.
+\section{Structure}
+
+\subsection{Lexer and Parser}
+\subsection{Abstract Syntax Tree}
+\subsection{Type checking}
+\subsection{Assembling}
+
+\section{Code overview}
+
+\begin{description}
+\item[\texttt{mjc}] Package containing executable main classes and the parser
+    code.
+    \begin{description}
+        \item[\texttt{mjc.JVMMain}] The main executable.
+    \end{description}
+\end{description}
+
+\section{Building, running and testing}
 
 \end{document}
