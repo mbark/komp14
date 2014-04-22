@@ -428,7 +428,7 @@ public class TypeCheckVisitor implements TypeVisitor {
         } else {
 
             // Ensure method is defined on said class
-            MethodTable mt = ct.getMethod(convertToSymbol(n.i));
+            MethodTable mt = getMethodTable(ct, convertToSymbol(n.i));
             if (mt == null) {
                 error.complain("Method " + n.i + " not defined for type "
                         + idType.toString());
@@ -456,6 +456,17 @@ public class TypeCheckVisitor implements TypeVisitor {
         }
 
         return returnType;
+    }
+    
+    private MethodTable getMethodTable(ClassTable ct, Symbol method) {
+        MethodTable mt = null;
+        
+        while(ct != null && mt == null) {
+            mt = ct.getMethod(method);
+            ct = currProgram.get(ct.getSuperClass());
+        }
+        
+        return mt;
     }
 
     @Override
