@@ -1,21 +1,21 @@
 class EvilNames {
     public static void main(String[] args) {
-		int invokevirtual;
+        int invokevirtual;
     }
 }
 
 class istore {
-	int lcmp;
-	int fstore;
+    int lcmp;
+    int fstore;
 
-	public istore ifeq(istore invokespecial) {
-		istore i;
-		i = new istore();
+    public istore ifeq(istore invokespecial) {
+        istore i;
+        i = new istore();
 
-		return invokespecial;
-	}
+        return invokespecial;
+    }
 }
 
 class lcmp {
-	int lcmp;
+    int lcmp;
 }
