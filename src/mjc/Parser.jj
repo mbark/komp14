@@ -43,6 +43,7 @@ TOKEN: {
     <BOOLEAN: "boolean"> |
     <CLASS: "class"> |
     <ELSE: "else"> |
+    <EXTENDS: "extends"> |
     <IF: "if"> |
     <INT: "int"> |
     <LENGTH: "length"> |
@@ -126,7 +127,7 @@ MainClass MainClass(): {
 }
 
 ClassDecl ClassDecl(): {
-    Token id;
+    Token id, parentId = null;
     VarDecl vd;
     VarDeclList vdl = new VarDeclList();
     MethodDecl md;
@@ -134,12 +135,22 @@ ClassDecl ClassDecl(): {
 }
 {
     <CLASS> id = <ID>
+    (
+        <EXTENDS> parentId = <ID>
+    )?
     <LBRACE>
         ( vd = VarDecl() { vdl.addElement(vd); } )*
         ( md = MethodDecl() { mdl.addElement(md); } )*
     <RBRACE>
     {
-        return new ClassDeclSimple(new Identifier(id), vdl, mdl);
+        if(parentId != null)
+        {
+            return new ClassDeclExtends(new Identifier(id), new Identifier(parentId), vdl, mdl);
+        }
+        else
+        {
+            return new ClassDeclSimple(new Identifier(id), vdl, mdl);
+        }
     }
 }
 

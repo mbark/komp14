@@ -64,7 +64,7 @@ public class TypeDefVisitor extends AbstractTypeDefVisitor {
     @Override
     public void visit(ClassDeclExtends n) {
         currClass = new ClassTable(convertToSymbol(n.i));
-        currClass.setSuperClass(convertToSymbol(n.i));
+        currClass.setSuperClass(convertToSymbol(n.j));
 
         super.visit(n);
 

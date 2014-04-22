@@ -68,8 +68,10 @@ public abstract class DepthFirstVisitor implements Visitor {
 
     @Override
     public void visit(ClassDeclExtends n) {
-        throw new UnsupportedOperationException(n.getClass().getName()
-                + " not implemented yet!");
+        n.i.accept(this);
+        n.j.accept(this);
+        visit(n.vl);
+        visit(n.ml);
     }
 
     @Override
