@@ -1,12 +1,15 @@
 class WrongNumberOfParams {
     public static void main(String[] args) {
+        Other o;
         int a;
-        a = (new A()).A(1);
+        o = new Other();
+        a = o.do(1);
+        a = o.do(1, 2, 3);
     }
 }
 
-class A {
-    public int A(int a, int b) {
+class Other {
+    public int do(int a, int b) {
         return 1;
     }
 }
