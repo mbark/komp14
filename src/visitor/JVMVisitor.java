@@ -5,8 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 
-import com.sun.org.apache.xalan.internal.xsltc.util.IntegerArray;
-
 import jvm.Hardware;
 import jvm.LabelTable;
 import symbol.ClassTable;
@@ -285,8 +283,8 @@ public class JVMVisitor {
         String s1 = n.s1.accept(this);
         String s2 = n.s2.accept(this);
 
-        String notEquals = labels.newLabel("ne");
-        String end = labels.newLabel("end");
+        String notEquals = labels.newLabel("if_ne");
+        String end = labels.newLabel("if_end");
 
         StringBuilder sb = appendOnNewline(exp, "ifeq " + notEquals, s1,
                 "goto " + end, notEquals + ":", s2, end + ":");
@@ -298,8 +296,8 @@ public class JVMVisitor {
         String exp = n.e.accept(this);
         String s = n.s.accept(this);
 
-        String whileLabel = labels.newLabel("while");
-        String doneLabel = labels.newLabel("done");
+        String whileLabel = labels.newLabel("while_start");
+        String doneLabel = labels.newLabel("while_done");
 
         StringBuilder sb = appendOnNewline(whileLabel + ":", exp, "ifeq "
                 + doneLabel, s, "goto " + whileLabel, doneLabel + ":");
@@ -338,13 +336,12 @@ public class JVMVisitor {
         String left = n.e1.accept(this);
         String right = n.e2.accept(this);
 
-        String trueLabel = labels.newLabel("true");
-        String end = labels.newLabel("end");
+        String evalRight = labels.newLabel("and_right");
+        String end = labels.newLabel("and_end");
 
-        StringBuilder sb = appendOnNewline(left, "dup", "ifne " + trueLabel,
-                "ldc " + FALSE, "goto " + end, trueLabel + ":", right, end
+        StringBuilder sb = appendOnNewline(left, "ifne " + evalRight,
+                "ldc " + FALSE, "goto " + end, evalRight + ":", right, end
                         + ":");
-        appendOnNewline(sb, "iand");
         return sb.toString();
     }
 
@@ -352,13 +349,13 @@ public class JVMVisitor {
         String left = n.e1.accept(this);
         String right = n.e2.accept(this);
 
-        String greaterThan = labels.newLabel("gt");
-        String end = labels.newLabel("end");
+        String lessThan = labels.newLabel("lessThan_lt");
+        String end = labels.newLabel("lessThan_end");
 
-        StringBuilder sb = appendOnNewline(right, left);
-        appendOnNewline(sb, "if_icmple " + greaterThan);
-        appendOnNewline(sb, "iconst_1", "goto " + end, greaterThan + ":",
-                "iconst_0", end + ":");
+        StringBuilder sb = appendOnNewline(left, right);
+        appendOnNewline(sb, "if_icmplt " + lessThan);
+        appendOnNewline(sb, "ldc " + FALSE, "goto " + end, lessThan + ":",
+                "ldc " + TRUE, end + ":");
 
         return sb.toString();
     }
@@ -463,10 +460,9 @@ public class JVMVisitor {
 
     public String visit(Not n) {
         String exp = n.e.accept(this);
-        String trueLbl = labels.newLabel("true");
-        String endLbl = labels.newLabel("end");
+        String trueLbl = labels.newLabel("not_true");
+        String endLbl = labels.newLabel("not_end");
 
-        // if true, push false else push true
         StringBuilder sb = appendOnNewline(exp, "ifeq " + trueLbl, "ldc "
                 + FALSE, "goto " + endLbl,  trueLbl + ":", "ldc " + TRUE, endLbl + ":");
 
