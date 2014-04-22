@@ -1,18 +1,42 @@
 class ArrayTest {
 	public static void main(String[] args) {
 		int[] array;
+		int i;
+		OtherClass c;
+
+		c = new OtherClass();
 		array = new int[5];
-		array[0] = 1;
-		array[1] = 2;
-		array[2] = 2;
-		array[3] = 2;
-		array[4] = 5;
-		System.out.println(array[4]);
+		array = c.doStuff(array);
+
+		i = 0;
+		while(i < array.length) {
+			System.out.println(array[i]);
+			i = i + 1;
+		}
 	}
 }
 
-class AClass {
-	public int doStuff(int i) {
-		return i;
+class OtherClass {
+	public int[] doStuff(int[] array) {
+		int i;
+		int j;
+		i = 1;
+		j = 3;
+
+		array[0] = 1;
+
+		array[i-1] = 0;
+		array[i] = 0;
+		array[i+1] = 0;
+		array[j*i] = 0;
+		array[i+j] = 0;
+
+		if(array[i-1] < 0) {
+			array[i-1] = 1;
+		} else {
+			array[i-1] = 0;
+		}
+
+		return array;
 	}
 }

@@ -212,17 +212,7 @@ public class JVMVisitor {
         currFrame.allocFormal("this", new IdentifierType(""));
         
         for (int i = 0; i < n.fl.size(); i++) {
-            Formal f = n.fl.elementAt(i);
-            String loadType;
-            
-            if(f.t instanceof IdentifierType) {
-                loadType = "aload";
-            } else if(f.t instanceof IntArrayType) {
-                loadType = "aload";
-            } else {
-                loadType = "iload";
-            }
-            appendOnNewline(sb, loadType + " " + (i+1), n.fl.elementAt(i).accept(this));
+            appendOnNewline(sb, n.fl.elementAt(i).accept(this));
         }
 
         for (int i = 0; i < n.vl.size(); i++) {
@@ -236,10 +226,10 @@ public class JVMVisitor {
         appendOnNewline(sb, n.e.accept(this));
 
         String returnCmd;
-        if (n.t instanceof IdentifierType) {
-            returnCmd = "areturn";
-        } else {
+        if (n.t instanceof IntegerType) {
             returnCmd = "ireturn";
+        } else {
+            returnCmd = "areturn";
         }
         appendOnNewline(sb, returnCmd);
 
@@ -254,8 +244,9 @@ public class JVMVisitor {
     public String visit(Formal n) {
         VMAccess access = currFrame.allocFormal(n.i.toString(), n.t);
         addAccess(n.i, access);
+        StringBuilder sb = appendOnNewline(access.load(), access.store());
 
-        return access.store();
+        return sb.toString();
     }
 
     public String visit(IntArrayType n) {
