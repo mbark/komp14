@@ -54,4 +54,29 @@ for program in `find $compdir/testcases/execute -name '*.java'`; do
     fi
 done
 
+for program in `find $compdir/testcases/nonexecute -name '*.java'`; do
+    rm -f $compdir/*.s
+
+    java -cp $java_classpath mjc.JVMMain "$program" -S > "$scratch" 2>&1
+    if [ $? -ne 0 ]; then
+        echo "Compilation error: False negative for \"$program\""
+        cat "$scratch"
+        continue
+    fi
+
+    java -jar $compdir/lib/jasmin.jar $compdir/*.s > /dev/null 2> "$scratch"
+    if [ -s "$scratch" ]; then
+        echo "Jasmin error: False negative for \"$program\""
+        cat "$scratch"
+        continue
+    fi
+
+    java_mainclass="`basename -s.java $program`"
+    java -cp $compdir $java_mainclass > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        echo "Execution error: False positive for \"$program\""
+        continue
+    fi
+done
+
 rm "$scratch"
