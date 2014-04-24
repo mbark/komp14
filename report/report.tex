@@ -26,13 +26,28 @@
 \thispagestyle{empty}
 
 \section{Introduction}
+This document describes the design and implementation of a compiler for a subset of the Java language.
+
+The document begins with a section about the structure of the program, following that is a section giving an overview of the code and finally comes a section about how to build, run and test the compiler.
 
 \section{Structure}
+In this section is a description of how the progrma is structured. The sections come in the order of steps when compiling, beginning with the lexing and parsing steps and ending with the assembling. The compiler compiles to the JVM and will therefore skip some steps at the end, taking a shortcut via jasmin to the JVM.
 
 \subsection{Lexer and Parser}
+The lexing and parsing are the first two steps. These are done with the help of a library called JavaCC, which transforms the given input string into tokens. Additionally JavaCC handles the parsing, by writing JavaCC specific code for the grammar. Both of these steps are therefore done in a single class, primarily with the help of JavaCC.
+
 \subsection{Abstract Syntax Tree}
+Constructing the Abstract Syntax Tree (AST), requires first creating the necessary classes to represent it. For each different terminator a class is created to represent it. The AST is then constructed during the parsing step, once again with the help of JavaCC. This means the lexing, parsing and construction of the AST are all done in one single step thanks to JavaCC.
+
 \subsection{Type checking}
+The type checking is done in two passes, first one pass is made binding all methods and variables to their types, and then a second pass is made checking that all types match each other. Doing two passes in this way means that we don't need to declare methods before they are used.
+
+When defining all types we use the visitor pattern to visit the AST recursively. Whenever we then encounter a method or a variable we then check what type it has and add this to a a symbol table, mapping variables or methods to their types.
+
+When doing the second pass we instead go through all expressions or operations on the variables, checking that they match what is allowed. Additionally when calling a method we check that the object it is called on has the method defined for it. This is once again done using a visitor, and going through the tree recursively.
+
 \subsection{Assembling}
+
 
 \section{Code overview}
 
