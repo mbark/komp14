@@ -31,20 +31,46 @@ This document describes the design and implementation of a compiler for a subset
 The document begins with a section about the structure of the program, following that is a section giving an overview of the code and finally comes a section about how to build, run and test the compiler.
 
 \section{Structure}
-In this section is a description of how the progrma is structured. The sections come in the order of steps when compiling, beginning with the lexing and parsing steps and ending with the assembling. The compiler compiles to the JVM and will therefore skip some steps at the end, taking a shortcut via jasmin to the JVM.
+In this section is a description of how the program is structured. The sections come in the order of steps when compiling, beginning with the lexing and parsing steps and ending with the assembling. The compiler compiles to the JVM and will therefore skip some steps at the end, taking a shortcut via jasmin to the JVM.
 
 \subsection{Lexer and Parser}
-The lexing and parsing are the first two steps. These are done with the help of a library called JavaCC, which transforms the given input string into tokens. Additionally JavaCC handles the parsing, by writing JavaCC specific code for the grammar. Both of these steps are therefore done in a single class, primarily with the help of JavaCC.
+The lexing and parsing are done using JavaCC, a Compiler Compiler for Java. JavaCC handles the tokenization and allows the programmer to write the LL grammar in jj files that JavaCC then \"compiles\" to Java files. In order to be able to use the LL grammar the given grammar had to have all left-recursion eliminated, as well as priority given to Exp operators.
+
+Eliminating left-recursion can be done simply in JavaCC by using the ability to match $0$ or more possible productions. The grammar
+
+$$A \rightarrow A + B$$
+
+can be converted to
+
+$$A \rightarrow B (+ B)*$$
+
+where star represents the ability to match $0$ or more times. Rewriting all rules this way all left recursion is eliminated.
+
+The other problem is to give priority to operators. This is done by simply following a rule. Assume we once again have the following grammar
+
+$$A \rightarrow B + B$$
+$$A \rightarrow B - B$$
+
+And we want $-$ to have higher priority than $+$, we simply rewrite it as
+
+$$A \rightarrow B + B$$
+$$B \rightarrow C - C$$
+
+This will give $-$ higher precendence than $+$.
 
 \subsection{Abstract Syntax Tree}
-Constructing the Abstract Syntax Tree (AST), requires first creating the necessary classes to represent it. For each different terminator a class is created to represent it. The AST is then constructed during the parsing step, once again with the help of JavaCC. This means the lexing, parsing and construction of the AST are all done in one single step thanks to JavaCC.
+Constructing the Abstract Syntax Tree (AST), requires first creating the necessary classes to represent it. For each different terminator a class is created to represent it. The AST is constructed during the parsing step, using JavaCC. When, for example, a Plus operator is found we will continue the parsing to find the left and right expression and then create the an instance of the Plus object. This object is then returned from the grammar rule.
 
 \subsection{Type checking}
-The type checking is done in two passes, first one pass is made binding all methods and variables to their types, and then a second pass is made checking that all types match each other. Doing two passes in this way means that we don't need to declare methods before they are used.
+The type checking is done in two passes, first one pass is made binding all methods and variables to their types, and then a second pass is made checking that all types match each other. In order to perform these two steps we need to recursively visit the entire AST, which we do by using the Visitor pattern.
 
-When defining all types we use the visitor pattern to visit the AST recursively. Whenever we then encounter a method or a variable we then check what type it has and add this to a a symbol table, mapping variables or methods to their types.
+The visitor pattern allows us...
 
-When doing the second pass we instead go through all expressions or operations on the variables, checking that they match what is allowed. Additionally when calling a method we check that the object it is called on has the method defined for it. This is once again done using a visitor, and going through the tree recursively.
+In order to save the types we use a symbol table to map the identifier to the type. We use three different symbol tables - a program table, a class table and a method table. Each table will save different information. The program table maps all class identifiers to their respective class table. The class tables map the method identifiers to their respective method tables, it also keeps track of what fields the class has as well as an optional super class. Finally the method table maps variable identifiers to their types The method table also keeps track of which variables are locals and and which are parameters.
+
+When binding identifiers to variables we then go through the tree and whenever we encounter the declaration of a class, method, field or variable we then declare it in it's matching table. Classes are added to the program table, methods and fields to the corresponding class table and variables to the corresponding method table.
+
+The program table, allowing access to all other tables, is then passed to the Visitor used for the variable checking. In the second pass we once again go through the tree checking that all operations on variables is correct. Additionally when calling a method we check that the object it is called on has the method defined for it. This is once again done using a visitor, and going through the tree recursively.
 
 \subsection{Assembling}
 
