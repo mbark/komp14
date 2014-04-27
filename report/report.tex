@@ -122,6 +122,8 @@ recursively.
 
 \subsection{Assembling}
 
+Assembling is done by traversing the AST, translating AST nodes into Jasmin
+assembly.
 
 \section{Code overview}
 
@@ -129,7 +131,22 @@ recursively.
 \item[\texttt{mjc}] Package containing executable main classes and the parser
     code.
     \begin{description}
-        \item[\texttt{mjc.JVMMain}] The main executable.
+        \item[\texttt{mjc.JVMMain}] The main JVM executable.
+        \item[\texttt{mjc.Parser}] The JavaCC-generated LL-parser.
+    \end{description}
+\item[\texttt{symbol}] Package containing abstractions of symbols and symbol
+    tables.
+\item[\texttt{syntaxtree}] Package containing class definitions for all AST
+    nodes.
+\item[\texttt{visitor}] Package containing implementations of visitors used to
+    traverse tree structures, such as the AST.
+    \begin{description}
+        \item[\texttt{visitor.TypeDefVisitor}] Traverses the AST and builds
+            a symbol table structure.
+        \item[\texttt{visitor.TypeCheckVisitor}] Traverses the AST and checks
+            types with help from the aforementioned symbol table.
+        \item[\texttt{visitor.JVMVisitor}] Traverses the AST and writes Jasmin
+            assembly.
     \end{description}
 \end{description}
 
