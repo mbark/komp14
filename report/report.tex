@@ -152,6 +152,20 @@ assembly.
 
 \section{Building, testing and running}
 
+The compiler can be built using the Java build tool Apache Ant\texttrademark.
+Just issue the command \texttt{ant} from the compiler root directory and Ant
+will generate the parser using JavaCC, compile the compiler and compress all JVM
+bytecode into a JAR archive.
+
+Testing the compiler can be done by using the script \texttt{./script/test}. It
+will first invoke Ant to ensure the compiler has been built and then proceed to
+test the compiler against the test cases found in the directory
+\texttt{testcases/}.
+
+Testing the compiler can be done by using the script \texttt{./script/run}.
+Given a MiniJava source file it will try to compile the file using our compiler
+and then to execute the generated program using the system Java runtime.
+
 \begin{thebibliography}{99}
 
 \bibitem{minijavaproject}
