@@ -16,9 +16,10 @@ PARSER_END(Parser)
 /* Whitespace. */
 SKIP: {
     " " |
-    "\t" |
+    "\f" |
     "\n" |
-    "\r"
+    "\r" |
+    "\t"
 }
 
 /* Comments. */
