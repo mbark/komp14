@@ -9,6 +9,7 @@ class Comments {
      */
     public static void main(String[] args) {
         // A comment on a separate line
+        // A comment with a unicode character: 2 ⁻2  2
         int a; // A comment after a vardecl
         a = 1;
         a = (a) + 3;
