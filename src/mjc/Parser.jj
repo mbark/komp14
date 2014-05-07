@@ -428,7 +428,7 @@ Exp ExpTerminator(): {
             }
         )
     |
-        <LNEG> e2 = Relational()
+        <LNEG> e2 = ExpTerminator()
         {
             e1 = new Not(e2);
         }
