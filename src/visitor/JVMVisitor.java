@@ -64,7 +64,7 @@ public class JVMVisitor {
 
     private HashMap<Identifier, VMAccess> locals;
     private HashMap<Identifier, VMAccess> fields;
-    
+
     private LabelTable labels;
 
     private static final int FALSE = 0;
@@ -114,7 +114,7 @@ public class JVMVisitor {
         currMethod = currClass.getMethod(Symbol.symbol("main"));
         currFrame = factory.newFrame("main", new FormalList(),
                 currMethod.getReturnType());
-        
+
         fields = new HashMap<>();
         locals = new HashMap<>();
 
@@ -154,8 +154,8 @@ public class JVMVisitor {
         currRecord = factory.newRecord(className);
         fields = new HashMap<>();
 
-        StringBuilder sb = appendOnNewline(".class public \'" + className + "\'",
-                ".super java/lang/Object");
+        StringBuilder sb = appendOnNewline(".class public \'" + className
+                + "\'", ".super java/lang/Object");
 
         for (int i = 0; i < n.vl.size(); i++) {
             appendOnNewline(sb, n.vl.elementAt(i).accept(this));
@@ -186,9 +186,8 @@ public class JVMVisitor {
         fields = new HashMap<>();
         String superClass = currClass.getSuperClass().toString();
 
-        StringBuilder sb = appendOnNewline(".class public \'" + className + "\'",
-                ".super " + superClass);
-        
+        StringBuilder sb = appendOnNewline(".class public \'" + className
+                + "\'", ".super " + superClass);
 
         for (int i = 0; i < n.vl.size(); i++) {
             appendOnNewline(sb, n.vl.elementAt(i).accept(this));
@@ -196,8 +195,8 @@ public class JVMVisitor {
 
         appendOnNewline(sb, ".method public <init>()V");
 
-        appendOnNewline(sb, "aload 0",
-                "invokespecial " + superClass + "/<init>()V");
+        appendOnNewline(sb, "aload 0", "invokespecial " + superClass
+                + "/<init>()V");
 
         appendOnNewline(sb, "return", ".end method");
 
@@ -235,21 +234,21 @@ public class JVMVisitor {
 
         String returnType = Hardware.signature(n.t);
         StringBuilder params = new StringBuilder();
-        for(int i = 0; i<n.fl.size(); i++) {
+        for (int i = 0; i < n.fl.size(); i++) {
             String signature = Hardware.signature(n.fl.elementAt(i).t);
             params.append(signature);
         }
-        StringBuilder sb = appendOnNewline(".method public " + n.i.s + "(" + params.toString() + ")"
-                + returnType);
+        StringBuilder sb = appendOnNewline(".method public " + n.i.s + "("
+                + params.toString() + ")" + returnType);
         // TODO: hard coded values
         int stackSize = 50;
         int nrOfLocals = 50;
         appendOnNewline(sb, ".limit stack " + stackSize, ".limit locals "
                 + nrOfLocals);
 
-//        allocate one spot for this
+        // allocate one spot for this
         currFrame.allocFormal("this", new IdentifierType(""));
-        
+
         for (int i = 0; i < n.fl.size(); i++) {
             appendOnNewline(sb, n.fl.elementAt(i).accept(this));
         }
@@ -346,11 +345,23 @@ public class JVMVisitor {
     }
 
     public String visit(Print n) {
-        String type = Hardware.signature(n.e.getType());
-        StringBuilder sb = appendOnNewline(
-                "getstatic java/lang/System/out Ljava/io/PrintStream;",
-                n.e.accept(this), "invokevirtual java/io/PrintStream/println("
-                        + type + ")V");
+        StringBuilder sb;
+        String value = n.e.accept(this);
+
+        if (n.e.getType() instanceof BooleanType) {
+            String notEquals = labels.newLabel("if_ne");
+            String end = labels.newLabel("if_end");
+            sb = appendOnNewline("getstatic java/lang/System/out Ljava/io/PrintStream;");
+            appendOnNewline(sb, value, "ifeq " + notEquals, "ldc \"true\"",
+                    "goto " + end, notEquals + ":", "ldc \"false\"", end + ":");
+            appendOnNewline(sb, "invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");
+        } else {
+            String type = Hardware.signature(n.e.getType());
+            sb = appendOnNewline(
+                    "getstatic java/lang/System/out Ljava/io/PrintStream;",
+                    value,
+                    "invokevirtual java/io/PrintStream/println(" + type + ")V");
+        }
 
         return sb.toString();
     }
@@ -379,9 +390,8 @@ public class JVMVisitor {
         String evalRight = labels.newLabel("and_right");
         String end = labels.newLabel("and_end");
 
-        StringBuilder sb = appendOnNewline(left, "ifne " + evalRight,
-                "ldc " + FALSE, "goto " + end, evalRight + ":", right, end
-                        + ":");
+        StringBuilder sb = appendOnNewline(left, "ifne " + evalRight, "ldc "
+                + FALSE, "goto " + end, evalRight + ":", right, end + ":");
         return sb.toString();
     }
 
@@ -502,7 +512,8 @@ public class JVMVisitor {
         String endLbl = labels.newLabel("not_end");
 
         StringBuilder sb = appendOnNewline(exp, "ifeq " + trueLbl, "ldc "
-                + FALSE, "goto " + endLbl,  trueLbl + ":", "ldc " + TRUE, endLbl + ":");
+                + FALSE, "goto " + endLbl, trueLbl + ":", "ldc " + TRUE, endLbl
+                + ":");
 
         return sb.toString();
     }
@@ -515,21 +526,21 @@ public class JVMVisitor {
     private static Symbol convertToSymbol(Identifier i) {
         return Symbol.symbol(i.toString());
     }
-    
+
     private void addFieldAccess(Identifier i, VMAccess a) {
         fields.put(i, a);
     }
-    
+
     private void addLocalAccess(Identifier i, VMAccess a) {
         locals.put(i, a);
     }
 
     private VMAccess getAccess(Identifier i) {
         VMAccess a = locals.get(i);
-        if(a == null) {
+        if (a == null) {
             a = fields.get(i);
         }
-        
+
         return a;
     }
 
