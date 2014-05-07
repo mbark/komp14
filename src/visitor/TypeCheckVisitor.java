@@ -162,6 +162,11 @@ public class TypeCheckVisitor implements TypeVisitor {
     @Override
     public Type visit(ClassDeclExtends n) {
         currClass = currProgram.get(convertToSymbol(n.i));
+        ClassTable superClass = currProgram.get(convertToSymbol(n.j));
+        if (superClass == null) {
+            error.complain("Super class " + n.j + " for class " + n.i
+                    + " does not exist");
+        }
 
         for (int i = 0; i < n.vl.size(); i++) {
             n.vl.elementAt(i).accept(this);
@@ -178,6 +183,15 @@ public class TypeCheckVisitor implements TypeVisitor {
 
     @Override
     public Type visit(VarDecl n) {
+        if (n.t instanceof IdentifierType) {
+            IdentifierType t = (IdentifierType) n.t;
+
+            ClassTable klass = currProgram.get(Symbol.symbol(t.s));
+            if (klass == null) {
+                error.complain("Class " + t.s + " does not exist");
+            }
+        }
+
         return n.t;
     }
 
@@ -457,15 +471,15 @@ public class TypeCheckVisitor implements TypeVisitor {
 
         return returnType;
     }
-    
+
     private MethodTable getMethodTable(ClassTable ct, Symbol method) {
         MethodTable mt = null;
-        
-        while(ct != null && mt == null) {
+
+        while (ct != null && mt == null) {
             mt = ct.getMethod(method);
             ct = currProgram.get(ct.getSuperClass());
         }
-        
+
         return mt;
     }
 
@@ -492,12 +506,12 @@ public class TypeCheckVisitor implements TypeVisitor {
     @Override
     public Type visit(This n) {
         if (currClass != null) {
-            if (currMethod != null) {
-                if (currMethod.getId().equals(Symbol.symbol("main"))) {
-                    error.complain("this can't be referenced from a static context");
-                    return new VoidType(); // TODO: change this?
-                }
-            }
+            /*
+             * if (currMethod != null) { if
+             * (currMethod.getId().equals(Symbol.symbol("main"))) {
+             * error.complain("this can't be referenced from a static context");
+             * return new VoidType(); // TODO: change this? } }
+             */
 
             return new IdentifierType(currClass.getId().toString());
         } else {
