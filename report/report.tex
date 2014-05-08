@@ -41,17 +41,22 @@ This section gives a description of how the program is structured. The sections
 come in the order of steps when compiling, beginning with the lexing and parsing
 steps and ending with the assembling. The compiler compiles to the JVM with help
 from the Jasmin assembler \cite{jasmin}. This allows us to skips a lot of common
-backend, steps such as Immediate Representation, Control Flow Analysis and
+backend steps, such as Immediate Representation, Control Flow Analysis and
 Register Allocation, since this is all taken care of by Jasmin.
 
 \subsection{Lexer and Parser}
 
 Lexing and parsing is done using JavaCC \cite{javacc}, a Compiler Compiler for
-Java. JavaCC handles tokenization and allows the programmer to write an LL
-grammar in \texttt{.jj} files, which then JavaCC then ``compiles'' to Java
-files. In order to be able to use a JavaCC-generated LL-parser, though, the
-given grammar had to have all left-recursion eliminated, and Exp operators had
-to be given the right precedence.
+Java generating LL-parsers. We also considered using ANTLR \cite{antlr}, a
+parser generator generating LR-parsers. After some experimentation with both
+libraries we decided to use JavaCC, mainly because we got the impression that
+JavaCC is more well-used and better documented.
+
+JavaCC handles tokenization and allows the programmer to write an LL grammar in
+\texttt{.jj} files, which then JavaCC then ``compiles'' to Java files. In order
+to be able to use a JavaCC-generated LL-parser, though, the given grammar had to
+have all left-recursion eliminated, and \textit{Exp} operators had to be given the
+right precedence.
 
 Eliminating left-recursion can be done simply in JavaCC by using the
 ability to match $0$ or more possible productions. The grammar
@@ -187,6 +192,11 @@ and then to execute the generated program using the system Java runtime.
     JavaCC contributors,
     \emph{Java Compiler Compiler\texttrademark (JavaCC\texttrademark) -- The Java Parser Generator},
     <\url{https://javacc.java.net/}>, retrieved 2014-04-27
+
+\bibitem{antlr}
+    ANTLR~/~T.~Parr,
+    \emph{ANTLR},
+    <\url{http://www.antlr.org/}>, retrieved 2014-05-08
 
 \end{thebibliography}
 
