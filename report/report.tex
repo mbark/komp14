@@ -2,10 +2,15 @@
 
 \usepackage[T1]{fontenc}
 \usepackage[english]{babel}
-\usepackage{listings}
 \usepackage{hyperref}
 
-\lstset{language=Java}
+\usepackage{listings}
+\lstset{%
+    frame=single,
+    language=Java,
+    numbers=left
+}
+
 \hypersetup{%
     pdfauthor = {Martin Barksten, Victor Koronen},
     pdftitle = {Compiler Construction},
@@ -214,9 +219,12 @@ and then to execute the generated program using the system Java runtime.
 
 \appendix
 
-\section{Parsing}
+\section{Parsing bugs}
 
-During the parsing the most interesting bug was how Not bound.
+\subsection{Binding of \textit{Not}}
+
+During parsing, the most interesting bug was the binding of \textit{Not}. As an
+example, consider the following piece of code.
 
 \begin{lstlisting}
 !false && true
@@ -228,23 +236,40 @@ The boolean expression above would be parsed as
 !(false && true)
 \end{lstlisting}
 
-This in turn caused some strange behavior that caused quite some trouble debugging. This bug was not found until during the JVM assembly. It took considerable time to debug what caused the problem due to the fact that almost all boolean logic during the JVM assembly was buggy (more about that in section JVM assembly). Once discovered that the bug was during the parsing, resolving it was easy.
+which is not correct.
 
-One thing learned from this experience is to debug more in earlier steps. We never properly tested the parser, which caused other hard to find bugs during the JVM assembly and type checking.
+This caused some strange behavior that turned out to be very difficult to debug.
+This bug was not found until work began on the JVM assembly stage. It took a
+considerable amount of time to debug this issue, mainly due to the fact that
+almost all boolean logic during the JVM assembly was buggy (more about that in
+section JVM assembly). Once discovered that the bug was during the parsing,
+resolving it was easy.
 
-\section{JVM Assembly}
+One thing learned from this experience is to debug more in earlier steps. We
+never properly tested the parser, which caused other hard to find bugs during
+the JVM assembly and type checking.
 
-When doing the JVM assembly several bugs related to logical operators were found and debugging attempted. The bug would arise when writing code as below.
+\section{JVM Assembly bugs}
+
+When implementing the JVM assembly step, several bugs related to logical
+operators were found and debugging attempted. The bug would arise when writing
+code as below.
 
 \begin{lstlisting}
 !(1 < 2)
 \end{lstlisting}
 
-The boolean expression would evaluate as false, when it is true. Finding why the bug arose was easy – branching on true or false was clearly wrong. However, correcting it took quite some time due to how the branching works.
+The boolean expression would evaluate as false, when it is true. Finding why the
+bug arose was easy -- branching on true or false was clearly wrong. However,
+correcting it took quite some time due to how the branching works.
 
-The JVM bytecode's built in ifeq compares to zero, which we internally used as false. So if ifeq branched, the value was false rather than true. This behavior made every single node in the AST related to booleans behave incorrectly.
+The JVM assembly instruction \texttt{ifeq} compares to zero, which we internally
+used as false. So if \texttt{ifeq} branched, the value was false rather than
+true. This behavior made every single node in the AST related to booleans behave
+incorrectly.
 
-Other minor bugs also arose when converting to bytecode, however these were all fixed faster and easier.
+Other minor bugs also arose when converting to bytecode, however these were all
+fixed faster and easier.
 
 \begin{thebibliography}{99}
 
