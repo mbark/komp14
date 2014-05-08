@@ -137,6 +137,25 @@ assembly.
 \section{Code overview}
 
 \begin{description}
+\item[\texttt{frame}] Package containing interfaces for abstractions of frames,
+    records and variable accesses.
+    \begin{description}
+        \item[\texttt{frame.VMAccess}] Interface for declaring, loading and
+            storing a variable on a VM.
+        \item[\texttt{frame.VMFrame}] Interface for handling frames on a VM.
+        \item[\texttt{frame.VMRecord}] Interface for handling heap objects on a
+            VM.
+    \end{description}
+\item[\texttt{jvm}] Package containing implementations of the frame, record and
+    variable access interfaces for the JVM.
+    \begin{description}
+        \item[\texttt{jvm.Frame}] Implementation of the frame handling interface
+            for the JVM.
+        \item[\texttt{jvm.Hardware}] Implementations of variable and method
+            signatures for the JVM.
+        \item[\texttt{jvm.Record}] Implementation of the heap object interface
+            for the JVM.
+    \end{description}
 \item[\texttt{mjc}] Package containing the executable main class and the parser
     code.
     \begin{description}
