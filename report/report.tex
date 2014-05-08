@@ -2,8 +2,10 @@
 
 \usepackage[T1]{fontenc}
 \usepackage[english]{babel}
-
+\usepackage{listings}
 \usepackage{hyperref}
+
+\lstset{language=Java}
 \hypersetup{%
     pdfauthor = {Martin Barksten, Victor Koronen},
     pdftitle = {Compiler Construction},
@@ -165,6 +167,40 @@ test the compiler against the test cases found in the directory
 Testing the compiler can be done by using the script \texttt{./script/run}.
 Given a MiniJava source file it will try to compile the file using our compiler
 and then to execute the generated program using the system Java runtime.
+
+\appendix
+
+\section{Parsing}
+
+During the parsing the most interesting bug was how Not bound.
+
+\begin{lstlisting}
+!false && true
+\end{lstlisting}
+
+The boolean expression above would be parsed as
+
+\begin{lstlisting}
+!(false && true)
+\end{lstlisting}
+
+This in turn caused some strange behavior that caused quite some trouble debugging. This bug was not found until during the JVM assembly. It took considerable time to debug what caused the problem due to the fact that almost all boolean logic during the JVM assembly was buggy (more about that in section JVM assembly). Once discovered that the bug was during the parsing, resolving it was easy.
+
+One thing learned from this experience is to debug more in earlier steps. We never properly tested the parser, which caused other hard to find bugs during the JVM assembly and type checking.
+
+\section{JVM Assembly}
+
+When doing the JVM assembly several bugs related to logical operators were found and debugging attempted. The bug would arise when writing code as below.
+
+\begin{lstlisting}
+!(1 < 2)
+\end{lstlisting}
+
+The boolean expression would evaluate as false, when it is true. Finding why the bug arose was easy – branching on true or false was clearly wrong. However, correcting it took quite some time due to how the branching works.
+
+The JVM bytecode's built in ifeq compares to zero, which we internally used as false. So if ifeq branched, the value was false rather than true. This behavior made every single node in the AST related to booleans behave incorrectly.
+
+Other minor bugs also arose when converting to bytecode, however these were all fixed faster and easier.
 
 \begin{thebibliography}{99}
 
