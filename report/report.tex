@@ -137,16 +137,31 @@ assembly.
 \section{Code overview}
 
 \begin{description}
-\item[\texttt{mjc}] Package containing executable main classes and the parser
+\item[\texttt{mjc}] Package containing the executable main class and the parser
     code.
     \begin{description}
-        \item[\texttt{mjc.JVMMain}] The main JVM executable.
+        \item[\texttt{mjc.JVMMain}] The main JVM executable. Parses command line
+            parameters, instantiates collaborator objects (such as the parser)
+            and orchestrates interaction between the collaborators to produce
+            the desired result.
         \item[\texttt{mjc.Parser}] The JavaCC-generated LL-parser.
     \end{description}
-\item[\texttt{symbol}] Package containing abstractions of symbols and symbol
-    tables.
+\item[\texttt{symbol}] Package containing abstractions of symbols and the symbol
+    table.
+    \begin{description}
+        \item[\texttt{symbol.Symbol}] The abstraction of a symbol.
+        \item[\texttt{symbol.ProgramTable}] The program symbol subtable.
+        \item[\texttt{symbol.ClassTable}] The class symbol subtable.
+        \item[\texttt{symbol.MethodTable}] The method symbol subtable.
+    \end{description}
 \item[\texttt{syntaxtree}] Package containing class definitions for all AST
     nodes.
+\item[\texttt{temp}] Package containing abstractions of assembly level labels
+    and variables.
+    \begin{description}
+        \item[\texttt{temp.Label}] The abstraction of a label.
+        \item[\texttt{temp.Temp}] The abstraction of a variable.
+    \end{description}
 \item[\texttt{visitor}] Package containing implementations of visitors used to
     traverse tree structures, such as the AST.
     \begin{description}
