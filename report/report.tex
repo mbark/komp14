@@ -43,17 +43,22 @@ This section gives a description of how the program is structured. The sections
 come in the order of steps when compiling, beginning with the lexing and parsing
 steps and ending with the assembling. The compiler compiles to the JVM with help
 from the Jasmin assembler \cite{jasmin}. This allows us to skips a lot of common
-backend, steps such as Immediate Representation, Control Flow Analysis and
+backend steps, such as Immediate Representation, Control Flow Analysis and
 Register Allocation, since this is all taken care of by Jasmin.
 
 \subsection{Lexer and Parser}
 
 Lexing and parsing is done using JavaCC \cite{javacc}, a Compiler Compiler for
-Java. JavaCC handles tokenization and allows the programmer to write an LL
-grammar in \texttt{.jj} files, which then JavaCC then ``compiles'' to Java
-files. In order to be able to use a JavaCC-generated LL-parser, though, the
-given grammar had to have all left-recursion eliminated, and Exp operators had
-to be given the right precedence.
+Java generating LL-parsers. We also considered using ANTLR \cite{antlr}, a
+parser generator generating LR-parsers. After some experimentation with both
+libraries we decided to use JavaCC, mainly because we got the impression that
+JavaCC is more well-used and better documented.
+
+JavaCC handles tokenization and allows the programmer to write an LL grammar in
+\texttt{.jj} files, which then JavaCC then ``compiles'' to Java files. In order
+to be able to use a JavaCC-generated LL-parser, though, the given grammar had to
+have all left-recursion eliminated, and \textit{Exp} operators had to be given the
+right precedence.
 
 Eliminating left-recursion can be done simply in JavaCC by using the
 ability to match $0$ or more possible productions. The grammar
@@ -72,14 +77,14 @@ accomplished by following a simple rule. Assume once again that we have the
 following grammar
 
 $$A \rightarrow B + B$$
-$$A \rightarrow B - B$$
+$$A \rightarrow B \times B$$
 
-and we want $-$ to have higher precedence than $+$. We can simply rewrite it as
+and we want $\times$ to have higher precedence than $+$. We can simply rewrite it as
 
-$$A \rightarrow B + B$$
-$$B \rightarrow C - C$$
+$$A \rightarrow B (+ B)*$$
+$$B \rightarrow C (\times C)*$$
 
-which will accomplish the goal of giving $-$ higher precendence than $+$.
+which will accomplish the goal of giving $\times$ higher precedence than $+$.
 
 \subsection{Abstract Syntax Tree}
 
@@ -95,19 +100,23 @@ returned from the grammar rule.
 The type checking is done in two passes. The first pass binds all methods and
 variables to their types, and the second pass checks that all statements and
 expressions operate on the right types. In order to perform these two steps we
-need to recursively visit the entire AST, which we do by using the Visitor
+need to recursively visit the entire AST, which we do by using the visitor
 pattern.
 
-The visitor pattern allows us\ldots
+The visitor pattern allows us to keep all the traversal logic in a single class,
+as opposed to having it spread out across all AST node classes
+\cite{oodesignvisitor}. This should help make the type checking process
+perspicuous.
 
 In order to save the types we use a symbol table to map an identifier to a
-corresponding type. We use three different symbol tables: a program table, a
-class table and a method table. Each table saves slightly different information.
-The program table maps all class identifiers to their respective class table.
-The class tables map the method identifiers to their respective method tables
-and also keeps track of what fields the class has, as well as an optional super
-class. Finally the method table maps variable identifiers to their types. The
-method table also keeps track of which variables are locals and which are
+corresponding type. We implement the symbol table using three different
+subtables: a program table, a class table and a method table. Each table saves
+slightly different information, which is why we chose to implement it in this
+fashion. The program table maps all class identifiers to their respective class
+table. The class tables map the method identifiers to their respective method
+tables and also keeps track of what fields the class has, as well as an optional
+super class. Finally the method table maps variable identifiers to their types.
+The method table also keeps track of which variables are locals and which are
 parameters.
 
 When binding identifiers to types we traverse the tree and whenever we encounter
@@ -130,23 +139,58 @@ assembly.
 \section{Code overview}
 
 \begin{description}
-\item[\texttt{mjc}] Package containing executable main classes and the parser
+\item[\texttt{frame}] Package containing interfaces for abstractions of frames,
+    records and variable accesses.
+    \begin{description}
+        \item[\texttt{frame.VMAccess}] Interface for declaring, loading and
+            storing a variable on a VM.
+        \item[\texttt{frame.VMFrame}] Interface for handling frames on a VM.
+        \item[\texttt{frame.VMRecord}] Interface for handling heap objects on a
+            VM.
+    \end{description}
+\item[\texttt{jvm}] Package containing implementations of the frame, record and
+    variable access interfaces for the JVM.
+    \begin{description}
+        \item[\texttt{jvm.Frame}] Implementation of the frame handling interface
+            for the JVM.
+        \item[\texttt{jvm.Hardware}] Implementations of variable and method
+            signatures for the JVM.
+        \item[\texttt{jvm.Record}] Implementation of the heap object interface
+            for the JVM.
+    \end{description}
+\item[\texttt{mjc}] Package containing the executable main class and the parser
     code.
     \begin{description}
-        \item[\texttt{mjc.JVMMain}] The main JVM executable.
+        \item[\texttt{mjc.JVMMain}] The main JVM executable. Parses command line
+            parameters, instantiates collaborator objects (such as the parser)
+            and orchestrates interaction between the collaborators to produce
+            the desired result.
         \item[\texttt{mjc.Parser}] The JavaCC-generated LL-parser.
     \end{description}
-\item[\texttt{symbol}] Package containing abstractions of symbols and symbol
-    tables.
+\item[\texttt{symbol}] Package containing abstractions of symbols and the symbol
+    table.
+    \begin{description}
+        \item[\texttt{symbol.Symbol}] The abstraction of a symbol.
+        \item[\texttt{symbol.ProgramTable}] The program symbol subtable.
+        \item[\texttt{symbol.ClassTable}] The class symbol subtable.
+        \item[\texttt{symbol.MethodTable}] The method symbol subtable.
+    \end{description}
 \item[\texttt{syntaxtree}] Package containing class definitions for all AST
     nodes.
+\item[\texttt{temp}] Package containing abstractions of assembly level labels
+    and variables.
+    \begin{description}
+        \item[\texttt{temp.Label}] The abstraction of a label.
+        \item[\texttt{temp.Temp}] The abstraction of a variable.
+    \end{description}
 \item[\texttt{visitor}] Package containing implementations of visitors used to
     traverse tree structures, such as the AST.
     \begin{description}
-        \item[\texttt{visitor.TypeDefVisitor}] Traverses the AST and builds
-            a symbol table structure.
-        \item[\texttt{visitor.TypeCheckVisitor}] Traverses the AST and checks
-            types with help from the aforementioned symbol table.
+        \item[\texttt{visitor.TypeDefVisitor}] Performs the first part of type
+            checking. Traverses the AST and builds a symbol table structure.
+        \item[\texttt{visitor.TypeCheckVisitor}] Performs the second part of
+            type checking. Traverses the AST and checks types with help from the
+            aforementioned symbol table.
         \item[\texttt{visitor.JVMVisitor}] Traverses the AST and writes Jasmin
             assembly.
     \end{description}
@@ -223,6 +267,16 @@ Other minor bugs also arose when converting to bytecode, however these were all 
     JavaCC contributors,
     \emph{Java Compiler Compiler\texttrademark (JavaCC\texttrademark) -- The Java Parser Generator},
     <\url{https://javacc.java.net/}>, retrieved 2014-04-27
+
+\bibitem{antlr}
+    ANTLR~/~T.~Parr,
+    \emph{ANTLR},
+    <\url{http://www.antlr.org/}>, retrieved 2014-05-08
+
+\bibitem{oodesignvisitor}
+    A.~Ianculescu,
+    \emph{Visitor Pattern},
+    <\url{http://www.oodesign.com/visitor-pattern.html}>, retrieved 2014-05-08
 
 \end{thebibliography}
 
