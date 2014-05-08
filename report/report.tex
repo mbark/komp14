@@ -75,14 +75,14 @@ accomplished by following a simple rule. Assume once again that we have the
 following grammar
 
 $$A \rightarrow B + B$$
-$$A \rightarrow B - B$$
+$$A \rightarrow B \times B$$
 
-and we want $-$ to have higher precedence than $+$. We can simply rewrite it as
+and we want $\times$ to have higher precedence than $+$. We can simply rewrite it as
 
-$$A \rightarrow B + B$$
-$$B \rightarrow C - C$$
+$$A \rightarrow B (+ B)*$$
+$$B \rightarrow C (\times C)*$$
 
-which will accomplish the goal of giving $-$ higher precendence than $+$.
+which will accomplish the goal of giving $\times$ higher precedence than $+$.
 
 \subsection{Abstract Syntax Tree}
 
