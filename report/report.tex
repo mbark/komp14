@@ -98,10 +98,13 @@ returned from the grammar rule.
 The type checking is done in two passes. The first pass binds all methods and
 variables to their types, and the second pass checks that all statements and
 expressions operate on the right types. In order to perform these two steps we
-need to recursively visit the entire AST, which we do by using the Visitor
+need to recursively visit the entire AST, which we do by using the visitor
 pattern.
 
-The visitor pattern allows us\ldots
+The visitor pattern allows us to keep all the traversal logic in a single class,
+as opposed to having it spread out across all AST node classes
+\cite{oodesignvisitor}. This should help make the type checking process
+perspicuous.
 
 In order to save the types we use a symbol table to map an identifier to a
 corresponding type. We use three different symbol tables: a program table, a
@@ -146,10 +149,11 @@ assembly.
 \item[\texttt{visitor}] Package containing implementations of visitors used to
     traverse tree structures, such as the AST.
     \begin{description}
-        \item[\texttt{visitor.TypeDefVisitor}] Traverses the AST and builds
-            a symbol table structure.
-        \item[\texttt{visitor.TypeCheckVisitor}] Traverses the AST and checks
-            types with help from the aforementioned symbol table.
+        \item[\texttt{visitor.TypeDefVisitor}] Performs the first part of type
+            checking. Traverses the AST and builds a symbol table structure.
+        \item[\texttt{visitor.TypeCheckVisitor}] Performs the second part of
+            type checking. Traverses the AST and checks types with help from the
+            aforementioned symbol table.
         \item[\texttt{visitor.JVMVisitor}] Traverses the AST and writes Jasmin
             assembly.
     \end{description}
@@ -197,6 +201,11 @@ and then to execute the generated program using the system Java runtime.
     ANTLR~/~T.~Parr,
     \emph{ANTLR},
     <\url{http://www.antlr.org/}>, retrieved 2014-05-08
+
+\bibitem{oodesignvisitor}
+    A.~Ianculescu,
+    \emph{Visitor Pattern},
+    <\url{http://www.oodesign.com/visitor-pattern.html}>, retrieved 2014-05-08
 
 \end{thebibliography}
 
