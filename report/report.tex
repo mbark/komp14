@@ -107,13 +107,14 @@ as opposed to having it spread out across all AST node classes
 perspicuous.
 
 In order to save the types we use a symbol table to map an identifier to a
-corresponding type. We use three different symbol tables: a program table, a
-class table and a method table. Each table saves slightly different information.
-The program table maps all class identifiers to their respective class table.
-The class tables map the method identifiers to their respective method tables
-and also keeps track of what fields the class has, as well as an optional super
-class. Finally the method table maps variable identifiers to their types. The
-method table also keeps track of which variables are locals and which are
+corresponding type. We implement the symbol table using three different
+subtables: a program table, a class table and a method table. Each table saves
+slightly different information, which is why we chose to implement it in this
+fashion. The program table maps all class identifiers to their respective class
+table. The class tables map the method identifiers to their respective method
+tables and also keeps track of what fields the class has, as well as an optional
+super class. Finally the method table maps variable identifiers to their types.
+The method table also keeps track of which variables are locals and which are
 parameters.
 
 When binding identifiers to types we traverse the tree and whenever we encounter
