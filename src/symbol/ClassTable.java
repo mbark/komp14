@@ -58,9 +58,8 @@ public class ClassTable {
         return fields.get(key);
     }
 
-    public Iterator<Symbol> keys() {
-        // TODO: Proper iteration?
-        return null;
+    public Iterator<Symbol> getMethods() {
+        return methods.keySet().iterator();
     }
 
     @Override
