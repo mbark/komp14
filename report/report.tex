@@ -6,9 +6,7 @@
 
 \usepackage{listings}
 \lstset{%
-    frame=single,
     language=Java,
-    numbers=left
 }
 
 \hypersetup{%
@@ -138,8 +136,51 @@ recursively.
 
 \subsection{Assembling}
 
-Assembling is done by traversing the AST, translating AST nodes into Jasmin
-assembly.
+Assembling is done by recursively traversing the AST, translating each node into Jasmin
+bytecode. The translation is done by first visiting all child nodes and getting their
+bytecode, then the node uses their code to generate its own byte. An example of this is the following code
+
+\begin{lstlisting}
+if(true) {
+    a = 1;
+} else {
+    a = 2;
+}
+\end{lstlisting}
+
+Which has an AST corresponding to the following structure \texttt{if(true, a = 1, a = 2)}.
+When assembling this node it will first get the bytecode for \texttt{true}, \texttt{a = 1}
+and \texttt{a = 2}. It will then use these to create the proper if statement. In this loading
+\texttt{true}, and doing a branch intruction.
+
+Two things to keep in mind during the assembling to bytecode is labels and the stack size.
+
+Labels need to be unique in order to not encountered strange and undefined behavior. In order
+to ensure this is done we save how many labels have been created with a specific name and when
+a node requires a new label the name given has a unique number appended to ensure uniqueness.
+
+The other problem - calculcating the stack size - is considerably harder. Each operation
+will push values to the stack, for example a method call will load the object being called
+and all parameters for the method. Creating a stack size of $p + 1$ where $p$ is the number of
+params for method.
+
+Calculating the number of values pushed to the stack for each operation is easy, the 
+problem is rather that the stack may grow during the calculcation of a these values. Assume
+we have the following code:
+
+\begin{lstlisting}
+obj.method(3 * 3)
+\end{lstlisting}
+
+If we just calculate the stack size of each separate operation we will find we need only
+a stack of size $1 + 1 = 2$. This is not the case though, as we need a stack of size $3$. The
+reason is we will push first \texttt{obj} and then the bytecode for $3 * 3$ which will push
+\texttt{3} twice before doing an operation on them. This means we need a stack of size $1+2 = 3$.
+
+Calculcating this stack size is harder and requires constantly keeping track of how large the stack is
+and for each node calculcate its maximum stack size, check if it is larger than the previously
+largest one and if so updating it. Once we've visited all nodes in a mathod in this way we then
+set the stack to the largest necessary in that method.
 
 \section{Code overview}
 
@@ -220,6 +261,7 @@ and then to execute the generated program using the system Java runtime.
 \appendix
 
 \section{Parsing bugs}
+In this section we describe the bugs that caused the most problems during the creation of the program.
 
 \subsection{Binding of \textit{Not}}
 
@@ -230,13 +272,11 @@ example, consider the following piece of code.
 !false && true
 \end{lstlisting}
 
-The boolean expression above would be parsed as
+This expression above would incorrectly be parsed as
 
 \begin{lstlisting}
 !(false && true)
 \end{lstlisting}
-
-which is not correct.
 
 This caused some strange behavior that turned out to be very difficult to debug.
 This bug was not found until work began on the JVM assembly stage. It took a
