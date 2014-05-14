@@ -135,6 +135,9 @@ recursively.
 
 \subsection{Assembling}
 
+The assembly step is done using Jasmin \cite{jasmin}. The reason is that
+Jasmin is, as the authos themselves say ``the de-facto standard assembly format for Java''.
+
 Assembling is done by recursively traversing the AST, translating each node into Jasmin
 bytecode. The translation is done by first visiting all child nodes and getting their
 bytecode, then the node uses their code to generate its own byte. An example of
@@ -163,13 +166,13 @@ Labels need to be unique in order to not encounter strange and undefined behavio
 by saving how many labels have been created with a specific name and when
 a node requires a new label the name given has a unique number appended to ensure uniqueness.
 
-The other problem - calculcating the stack size - is considerably harder. The first problem
-is to calculcate for each operation how many large a stack it will require at most. This is
+The other problem - calculating the stack size - is considerably harder. The first problem
+is to calculate for each operation how many large a stack it will require at most. This is
 rather straightforward, as an example a method call will load the object being called
 and all parameters for the method. This will require a stack size of $p + 1$ where $p$
 is the number of params for the method.
 
-The tricky part is that the stack may grow during the calculcation of a values. As an example
+The tricky part is that the stack may grow during the calculation of a values. As an example
 assume we have the following code:
 
 \begin{lstlisting}
@@ -177,13 +180,13 @@ obj.method(3 * 3)
 \end{lstlisting}
 
 If we just calculate the stack size of each separate operation we will find we need only
-a stack of size $1 + 1 = 2$ according to the formula given abobe. However, if we actually
+a stack of size $1 + 1 = 2$ according to the formula given above. However, if we actually
 check we will see that first \texttt{obj} will be pushed and then the bytecode for $3 * 3$,
 which will push \texttt{3} twice before doing an operation on them. This means we need a
 stack of size $1+2 = 3$.
 
 Thus in order to correctly calculate the stack size the compiler must keep track of how
-large the stack currently is. Then each node calculcates its required stack size, which is
+large the stack currently is. Then each node calculates its required stack size, which is
 the current stack size plus the number of values pushed by the node. The maximum required
 stack size by all nodes inside a method is the methods required maximum stack size.
 
