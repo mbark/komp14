@@ -136,7 +136,7 @@ recursively.
 \subsection{Assembling}
 
 The assembly step is done using Jasmin \cite{jasmin}. The reason is that
-Jasmin is, as the authos themselves say ``the de-facto standard assembly format for Java''.
+Jasmin is, as the authors themselves say ``the de-facto standard assembly format for Java''.
 
 Assembling is done by recursively traversing the AST, translating each node into Jasmin
 bytecode. The translation is done by first visiting all child nodes and getting their
@@ -151,13 +151,13 @@ if(true) {
 }
 \end{lstlisting}
 
-Which has an AST  roughly corresponding to \texttt{if(true, (a = 1), (a = 2))}.
+Which has an AST roughly corresponding to \texttt{if(true, (a = 1), (a = 2))}.
 When assembling this node it will first get the bytecode for \texttt{true}, \texttt{a = 1}
 and \texttt{a = 2}. It will then use these to create the proper if statement, which is
 to load \texttt{true} and then do a branch instruction executing either \texttt{a = 1} or
 \texttt{a = 2}.
 
-In order to keep the assembling simple all \texttt{Exp}s will leave the value behind at the head
+In order to keep the assembling simple, all \texttt{Exp}s will leave the value behind at the head
 of the stack, as could be expected.
 
 Two things to keep in mind during the assembling to bytecode is labels and the stack size.
@@ -166,13 +166,13 @@ Labels need to be unique in order to not encounter strange and undefined behavio
 by saving how many labels have been created with a specific name and when
 a node requires a new label the name given has a unique number appended to ensure uniqueness.
 
-The other problem - calculating the stack size - is considerably harder. The first problem
-is to calculate for each operation how many large a stack it will require at most. This is
+The other problem -- calculating the stack size -- is considerably harder. The first problem
+is to calculate for each operation how large a stack it will require at most. This is
 rather straightforward, as an example a method call will load the object being called
 and all parameters for the method. This will require a stack size of $p + 1$ where $p$
-is the number of params for the method.
+is the number of parameters for the method.
 
-The tricky part is that the stack may grow during the calculation of a values. As an example
+The tricky part is that the stack may grow during the calculation of values. As an example
 assume we have the following code:
 
 \begin{lstlisting}
@@ -262,7 +262,7 @@ will first invoke Ant to ensure the compiler has been built and then proceed to
 test the compiler against the test cases found in the directory
 \texttt{testcases/}.
 
-Testing the compiler can be done by using the script \texttt{./script/run}.
+Running the compiler can be done by using the script \texttt{./script/run}.
 Given a MiniJava source file it will try to compile the file using our compiler
 and then to execute the generated program using the system Java runtime.
 
