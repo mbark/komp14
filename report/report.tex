@@ -38,32 +38,33 @@ adaptations \cite{dd2488project} for the course DD2488 at KTH).
 
 The document begins with a section about the structure of the program, followed
 by a section giving an overview of the code and finally a section about how to
-build, test and run the compiler.
+build, test and run the compiler. Included in the appendix is a section about some
+of the trickier bugs encountered.
 
 \section{Structure}
 
 This section gives a description of how the program is structured. The sections
 come in the order of steps when compiling, beginning with the lexing and parsing
 steps and ending with the assembling. The compiler compiles to the JVM with help
-from the Jasmin assembler \cite{jasmin}. This allows us to skips a lot of common
-backend steps, such as Immediate Representation, Control Flow Analysis and
-Register Allocation, since this is all taken care of by Jasmin.
+from the Jasmin assembler \cite{jasmin}. Compiling to the JVM with Jasmin
+allows us to skips a lot of common backend steps, such as Immediate Representation,
+Control Flow Analysis and Register Allocation.
 
 \subsection{Lexer and Parser}
 
 Lexing and parsing is done using JavaCC \cite{javacc}, a Compiler Compiler for
-Java generating LL-parsers. We also considered using ANTLR \cite{antlr}, a
-parser generator generating LR-parsers. After some experimentation with both
+Java that generates a LL-parser. We also considered using ANTLR \cite{antlr}, a
+parser generator that generates LR-parsers. After some experimentation with both
 libraries we decided to use JavaCC, mainly because we got the impression that
 JavaCC is more well-used and better documented.
 
 JavaCC handles tokenization and allows the programmer to write an LL grammar in
-\texttt{.jj} files, which then JavaCC then ``compiles'' to Java files. In order
-to be able to use a JavaCC-generated LL-parser, though, the given grammar had to
-have all left-recursion eliminated, and \textit{Exp} operators had to be given the
+\texttt{.jj} files, which JavaCC then ``compile'' to Java files. In order
+to be able to use a JavaCC-generated LL-parser the given grammar had to
+have all left-recursion eliminated, and the \textit{Exp} operators had to be given the
 right precedence.
 
-Eliminating left-recursion can be done simply in JavaCC by using the
+Eliminating left-recursion can be done in JavaCC by using the
 ability to match $0$ or more possible productions. The grammar
 
 $$A \rightarrow A + B$$
@@ -72,11 +73,10 @@ can be converted to
 
 $$A \rightarrow B (+ B)*$$
 
-where star represents the ability to match $0$ or more times. Rewriting all
-productions this way allowed us to eliminate all left-recursion.
+where star means it should match $0$ or more times. When rewriting it this way
+it is clear that the left recursion has been eliminated.
 
-The other problem was to give operators the right precedence. This was
-accomplished by following a simple rule. Assume once again that we have the
+The other problem was to give operators the right precedence. Assume that we have the
 following grammar
 
 $$A \rightarrow B + B$$
@@ -87,15 +87,15 @@ and we want $\times$ to have higher precedence than $+$. We can simply rewrite i
 $$A \rightarrow B (+ B)*$$
 $$B \rightarrow C (\times C)*$$
 
-which will accomplish the goal of giving $\times$ higher precedence than $+$.
+which will give $\times$ higher precedence than $+$.
 
 \subsection{Abstract Syntax Tree}
 
 Constructing the Abstract Syntax Tree (AST) first requires creating all classes
 necessary to represent it, one class for each unique terminator. The AST is
-constructed during the parsing step using JavaCC. When, for example, a Plus
+constructed during the parsing step using JavaCC. When, for example, a \texttt{Plus}
 operator is found, we will continue the parsing to find the left and right
-expression and then create an instance of the Plus class. This object is then
+expression and then create an instance of the \texttt{Plus} class. This object is then
 returned from the grammar rule.
 
 \subsection{Type checking}
@@ -108,15 +108,14 @@ pattern.
 
 The visitor pattern allows us to keep all the traversal logic in a single class,
 as opposed to having it spread out across all AST node classes
-\cite{oodesignvisitor}. This should help make the type checking process
-perspicuous.
+\cite{oodesignvisitor}.
 
 In order to save the types we use a symbol table to map an identifier to a
 corresponding type. We implement the symbol table using three different
-subtables: a program table, a class table and a method table. Each table saves
+tables: a program table, a class table and a method table. Each table saves
 slightly different information, which is why we chose to implement it in this
 fashion. The program table maps all class identifiers to their respective class
-table. The class tables map the method identifiers to their respective method
+table. The class tables maps the method identifiers to their respective method
 tables and also keeps track of what fields the class has, as well as an optional
 super class. Finally the method table maps variable identifiers to their types.
 The method table also keeps track of which variables are locals and which are
@@ -129,7 +128,7 @@ corresponding class table and variables to the corresponding method table.
 
 The program table, allowing access to all other tables, is then passed to the
 visitor used for the second pass. In the second pass we once again traverse the
-tree checking that all operations on variables is correct. Additionally when
+tree, checking that all operations on variables is correct. Additionally when
 calling a method we check that the object it is called on has the method defined
 for it. This is once again done using a visitor, and traversing the tree
 recursively.
@@ -138,7 +137,8 @@ recursively.
 
 Assembling is done by recursively traversing the AST, translating each node into Jasmin
 bytecode. The translation is done by first visiting all child nodes and getting their
-bytecode, then the node uses their code to generate its own byte. An example of this is the following code
+bytecode, then the node uses their code to generate its own byte. An example of
+this is the following code
 
 \begin{lstlisting}
 if(true) {
@@ -148,39 +148,44 @@ if(true) {
 }
 \end{lstlisting}
 
-Which has an AST corresponding to the following structure \texttt{if(true, a = 1, a = 2)}.
+Which has an AST  roughly corresponding to \texttt{if(true, (a = 1), (a = 2))}.
 When assembling this node it will first get the bytecode for \texttt{true}, \texttt{a = 1}
-and \texttt{a = 2}. It will then use these to create the proper if statement. In this loading
-\texttt{true}, and doing a branch intruction.
+and \texttt{a = 2}. It will then use these to create the proper if statement, which is
+to load \texttt{true} and then do a branch instruction executing either \texttt{a = 1} or
+\texttt{a = 2}.
+
+In order to keep the assembling simple all \texttt{Exp}s will leave the value behind at the head
+of the stack, as could be expected.
 
 Two things to keep in mind during the assembling to bytecode is labels and the stack size.
 
-Labels need to be unique in order to not encountered strange and undefined behavior. In order
-to ensure this is done we save how many labels have been created with a specific name and when
+Labels need to be unique in order to not encounter strange and undefined behavior. This is done
+by saving how many labels have been created with a specific name and when
 a node requires a new label the name given has a unique number appended to ensure uniqueness.
 
-The other problem - calculcating the stack size - is considerably harder. Each operation
-will push values to the stack, for example a method call will load the object being called
-and all parameters for the method. Creating a stack size of $p + 1$ where $p$ is the number of
-params for method.
+The other problem - calculcating the stack size - is considerably harder. The first problem
+is to calculcate for each operation how many large a stack it will require at most. This is
+rather straightforward, as an example a method call will load the object being called
+and all parameters for the method. This will require a stack size of $p + 1$ where $p$
+is the number of params for the method.
 
-Calculating the number of values pushed to the stack for each operation is easy, the 
-problem is rather that the stack may grow during the calculcation of a these values. Assume
-we have the following code:
+The tricky part is that the stack may grow during the calculcation of a values. As an example
+assume we have the following code:
 
 \begin{lstlisting}
 obj.method(3 * 3)
 \end{lstlisting}
 
 If we just calculate the stack size of each separate operation we will find we need only
-a stack of size $1 + 1 = 2$. This is not the case though, as we need a stack of size $3$. The
-reason is we will push first \texttt{obj} and then the bytecode for $3 * 3$ which will push
-\texttt{3} twice before doing an operation on them. This means we need a stack of size $1+2 = 3$.
+a stack of size $1 + 1 = 2$ according to the formula given abobe. However, if we actually
+check we will see that first \texttt{obj} will be pushed and then the bytecode for $3 * 3$,
+which will push \texttt{3} twice before doing an operation on them. This means we need a
+stack of size $1+2 = 3$.
 
-Calculcating this stack size is harder and requires constantly keeping track of how large the stack is
-and for each node calculcate its maximum stack size, check if it is larger than the previously
-largest one and if so updating it. Once we've visited all nodes in a mathod in this way we then
-set the stack to the largest necessary in that method.
+Thus in order to correctly calculate the stack size the compiler must keep track of how
+large the stack currently is. Then each node calculcates its required stack size, which is
+the current stack size plus the number of values pushed by the node. The maximum required
+stack size by all nodes inside a method is the methods required maximum stack size.
 
 \section{Code overview}
 
@@ -265,7 +270,7 @@ In this section we describe the bugs that caused the most problems during the cr
 
 \subsection{Binding of \textit{Not}}
 
-During parsing, the most interesting bug was the binding of \textit{Not}. As an
+During parsing the most interesting bug was the binding of \textit{Not}. As an
 example, consider the following piece of code.
 
 \begin{lstlisting}
@@ -279,29 +284,31 @@ This expression above would incorrectly be parsed as
 \end{lstlisting}
 
 This caused some strange behavior that turned out to be very difficult to debug.
-This bug was not found until work began on the JVM assembly stage. It took a
-considerable amount of time to debug this issue, mainly due to the fact that
-almost all boolean logic during the JVM assembly was buggy (more about that in
-section JVM assembly). Once discovered that the bug was during the parsing,
-resolving it was easy.
+This bug was not found until work began on the JVM assembly stage. Finding what
+caused the bug caused considerable headache both because we assumed our parser
+was correct and because almost all boolean logic was incorrect (more about that in
+the section about JVM assembly bugs). Thus two bugs became entangled which made
+it hard to find either of the two.
 
-One thing learned from this experience is to debug more in earlier steps. We
-never properly tested the parser, which caused other hard to find bugs during
-the JVM assembly and type checking.
+Once we discovered that the bug was in the parser resolving it was easy.
 
-\section{JVM Assembly bugs}
+The thing we learned from this was to debug more in earlier steps, and if we don't
+be less trusting of them. Unnecessary time was spent debugging the JVM assembler
+because we didn't test the parser enough.
+
+\section{Branching logic in the JVM}
 
 When implementing the JVM assembly step, several bugs related to logical
-operators were found and debugging attempted. The bug would arise when writing
-code as below.
+operators were found. The bug would arise when having code as below (note
+the use of the \texttt{Not} operator here).
 
 \begin{lstlisting}
 !(1 < 2)
 \end{lstlisting}
 
-The boolean expression would evaluate as false, when it is true. Finding why the
+The expression would incorrectly evaluate as false. Finding why the
 bug arose was easy -- branching on true or false was clearly wrong. However,
-correcting it took quite some time due to how the branching works.
+fixing it took quite some time due to how the branching works.
 
 The JVM assembly instruction \texttt{ifeq} compares to zero, which we internally
 used as false. So if \texttt{ifeq} branched, the value was false rather than
