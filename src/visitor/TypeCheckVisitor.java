@@ -313,8 +313,9 @@ public class TypeCheckVisitor implements TypeVisitor {
         }
         final Type rightType = n.e.accept(this);
 
-        if (!leftType.equals(rightType)) {
-            error.complain("Expression must be of same type as var, expected: "
+        if (!leftType.equals(rightType)
+                && !(isSuperClassOf(leftType, rightType))) {
+            error.complain("Expression must be of same type as or superclass to var, expected: "
                     + leftType + " actual: " + rightType);
         }
         return new VoidType();
@@ -562,6 +563,29 @@ public class TypeCheckVisitor implements TypeVisitor {
 
     private static Symbol convertToSymbol(Identifier i) {
         return Symbol.symbol(i.toString());
+    }
+
+    private boolean isSuperClassOf(Type leftType, Type rightType) {
+        if (!(leftType instanceof IdentifierType && rightType instanceof IdentifierType)) {
+            return false;
+        }
+
+        IdentifierType leftIdType = (IdentifierType) leftType;
+        IdentifierType rightIdType = (IdentifierType) rightType;
+        ClassTable rightClass = currProgram.get(Symbol.symbol(rightIdType.s));
+
+        while (rightClass != null) {
+            rightIdType = new IdentifierType(rightClass.getSuperClass()
+                    .toString());
+
+            if (leftIdType.equals(rightIdType)) {
+                return true;
+            }
+
+            rightClass = currProgram.get(Symbol.symbol(rightIdType.s));
+        }
+
+        return false;
     }
 
 }
