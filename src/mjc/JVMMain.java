@@ -22,8 +22,6 @@ public class JVMMain {
         public boolean generateAssemblyCode = false;
         public boolean printSyntaxTree = false;
         public boolean printSymbolTable = false;
-        public boolean printIntermediateRepresentation = false;
-        public boolean viewIntermediateRepresentation = false;
         public Target target = Target.JVM;
 
         public boolean parseOption(String option) {
@@ -36,12 +34,6 @@ public class JVMMain {
                 break;
             case "-sym":
                 printSymbolTable = true;
-                break;
-            case "-ir":
-                printIntermediateRepresentation = true;
-                break;
-            case "-tv":
-                viewIntermediateRepresentation = true;
                 break;
             default:
                 return false;

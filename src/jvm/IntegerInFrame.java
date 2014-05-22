@@ -2,7 +2,7 @@ package jvm;
 
 public class IntegerInFrame implements frame.VMAccess {
     private String escapedName;
-    
+
     public IntegerInFrame(String name, int offset, String signature) {
         n = name;
         o = offset;

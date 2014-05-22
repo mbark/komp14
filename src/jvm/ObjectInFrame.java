@@ -1,7 +1,11 @@
 package jvm;
 
 public class ObjectInFrame implements frame.VMAccess {
+    private int o;
+    private String n;
+    private String s;
     private String escapedName;
+
     public ObjectInFrame(String name, int offset, String signature) {
         n = name;
         o = offset;
@@ -46,8 +50,4 @@ public class ObjectInFrame implements frame.VMAccess {
             return "    astore " + o + " ; " + escapedName;
         }
     }
-
-    private int o;
-    private String n;
-    private String s;
 }

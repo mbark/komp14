@@ -1,7 +1,11 @@
 package jvm;
 
 public class OnHeap implements frame.VMAccess {
+    private String c;
+    private String f;
+    private String s;
     private String escapedName;
+
     public OnHeap(String className, String fieldName, String signature) {
         c = className;
         f = fieldName;
@@ -29,8 +33,4 @@ public class OnHeap implements frame.VMAccess {
                "    swap\n" +
                "    putfield " + c + "/" + f + " " + s;
     }
-
-    private String c;
-    private String f;
-    private String s;
 }

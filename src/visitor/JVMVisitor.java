@@ -139,8 +139,8 @@ public class JVMVisitor {
         appendOnNewline(post, "return", ".end method");
 
         int nrOfLocals = n.vl.size() + 1 + 1;
-        appendOnNewline(pre, ".limit stack " + currStackSizeNeeded, ".limit locals "
-                + nrOfLocals, post.toString());
+        appendOnNewline(pre, ".limit stack " + currStackSizeNeeded,
+                ".limit locals " + nrOfLocals, post.toString());
 
         fields = null;
         locals = null;
@@ -174,7 +174,7 @@ public class JVMVisitor {
         for (int i = 0; i < n.ml.size(); i++) {
             appendOnNewline(sb, n.ml.elementAt(i).accept(this));
         }
-        
+
         setStackSize(1);
 
         fields = null;
@@ -208,7 +208,7 @@ public class JVMVisitor {
         for (int i = 0; i < n.ml.size(); i++) {
             appendOnNewline(sb, n.ml.elementAt(i).accept(this));
         }
-        
+
         setStackSize(1);
 
         fields = null;
@@ -278,7 +278,7 @@ public class JVMVisitor {
         appendOnNewline(post, "return", ".end method");
 
         int stackSize = currStackSizeNeeded;
-//        One extra local for the this variable
+        // One extra local for the this variable
         int nrOfLocals = n.vl.size() + n.fl.size() + 1;
         appendOnNewline(pre, ".limit stack " + stackSize, ".limit locals "
                 + nrOfLocals, post.toString());
@@ -337,7 +337,7 @@ public class JVMVisitor {
 
         StringBuilder sb = appendOnNewline(exp, "ifeq " + notEquals, s1,
                 "goto " + end, notEquals + ":", s2, end + ":");
-        
+
         setStackSize(1);
         currStackSize = currStackSize - 1;
 
@@ -353,7 +353,7 @@ public class JVMVisitor {
 
         StringBuilder sb = appendOnNewline(whileLabel + ":", exp, "ifeq "
                 + doneLabel, s, "goto " + whileLabel, doneLabel + ":");
-        
+
         setStackSize(1);
         currStackSize = currStackSize - 1;
 
@@ -379,7 +379,7 @@ public class JVMVisitor {
                     value, "invokevirtual java/io/PrintStream/println(" + type
                             + ")V");
         }
-        
+
         setStackSize(2);
         currStackSize = currStackSize - 1;
 
@@ -389,7 +389,7 @@ public class JVMVisitor {
     public String visit(Assign n) {
         VMAccess access = getAccess(n.i);
         StringBuilder sb = appendOnNewline(n.e.accept(this), access.store());
-        
+
         setStackSize(1);
         currStackSize = currStackSize - 1;
         return sb.toString();
@@ -417,7 +417,7 @@ public class JVMVisitor {
 
         StringBuilder sb = appendOnNewline(left, "ifne " + evalRight, "ldc "
                 + FALSE, "goto " + end, evalRight + ":", right, end + ":");
-        
+
         setStackSize(2);
         currStackSize = currStackSize - 2 + 1;
         return sb.toString();
@@ -445,7 +445,7 @@ public class JVMVisitor {
         String right = n.e2.accept(this);
 
         StringBuilder sb = appendOnNewline(left, right, "iadd");
-        
+
         setStackSize(2);
         currStackSize = currStackSize - 2 + 1;
         return sb.toString();
@@ -456,7 +456,7 @@ public class JVMVisitor {
         String right = n.e2.accept(this);
 
         StringBuilder sb = appendOnNewline(left, right, "isub");
-        
+
         setStackSize(2);
         currStackSize = currStackSize - 2 + 1;
         return sb.toString();
@@ -467,7 +467,7 @@ public class JVMVisitor {
         String right = n.e2.accept(this);
 
         StringBuilder sb = appendOnNewline(left, right, "imul");
-        
+
         setStackSize(2);
         currStackSize = currStackSize - 2 + 1;
         return sb.toString();
@@ -477,7 +477,7 @@ public class JVMVisitor {
         String o = n.e1.accept(this);
         String i = n.e2.accept(this);
         StringBuilder sb = appendOnNewline(o, i, "iaload");
-        
+
         setStackSize(2);
         currStackSize = currStackSize - 2 + 1;
 
@@ -490,7 +490,7 @@ public class JVMVisitor {
 
         setStackSize(1);
         currStackSize = currStackSize - 1 + 1;
-        
+
         return sb.toString();
     }
 
@@ -517,7 +517,7 @@ public class JVMVisitor {
         String methodCall = "invokevirtual " + className + "/" + n.i.s + "("
                 + paramTypes.toString() + ")" + returnType;
         appendOnNewline(sb, methodCall);
-        
+
         setStackSize(stackNeeded);
         currStackSize = currStackSize - stackNeeded + 1;
 
@@ -555,7 +555,7 @@ public class JVMVisitor {
         StringBuilder sb = appendOnNewline(size, "newarray int");
         setStackSize(1);
         currStackSize = currStackSize - 1 + 1;
-        
+
         return sb.toString();
     }
 
@@ -563,7 +563,7 @@ public class JVMVisitor {
         String type = n.i.s;
         StringBuilder sb = appendOnNewline("new \'" + type + "\'", "dup",
                 "invokespecial " + type + "/<init>()V");
-        
+
         setStackSize(2);
         currStackSize++;
         return sb.toString();
@@ -577,7 +577,7 @@ public class JVMVisitor {
         StringBuilder sb = appendOnNewline(exp, "ifeq " + trueLbl, "ldc "
                 + FALSE, "goto " + endLbl, trueLbl + ":", "ldc " + TRUE, endLbl
                 + ":");
-        
+
         setStackSize(1);
         currStackSize = currStackSize - 1 + 1;
         return sb.toString();
@@ -625,8 +625,9 @@ public class JVMVisitor {
             sb.append(s[i] + "\n");
         }
     }
-    
+
     private void setStackSize(int stackNeeded) {
-        currStackSizeNeeded = Math.max(stackNeeded + currStackSize, currStackSizeNeeded);
+        currStackSizeNeeded = Math.max(stackNeeded + currStackSize,
+                currStackSizeNeeded);
     }
 }

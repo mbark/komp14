@@ -138,7 +138,6 @@ public class TreePrinter {
         } else {
             indent(d);
             say("null");
-//            throw new Error("Print.prStm " + " for " + s + " with d = " + d);
         }
     }
 
@@ -250,7 +249,6 @@ public class TreePrinter {
         } else {
             indent(d);
             say("null");
-//            throw new Error("Print.prExp " + " for " + e + " with d = " + d);
         }
     }
 

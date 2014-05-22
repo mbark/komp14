@@ -8,7 +8,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 /**
  * A class that creates a tree view of Appel's TREE code. Can be used as
  * follows:
- *
+ * 
  * <PRE>
  * tree.View viewer = new tree.View(&quot;Name of function&quot;);
  * viewer.addStm(treeBody);

@@ -3,7 +3,6 @@ package visitor;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import symbol.*;
 import symbol.ClassTable;
 import symbol.MethodTable;
 import symbol.ProgramTable;
