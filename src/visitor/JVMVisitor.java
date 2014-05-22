@@ -66,7 +66,7 @@ public class JVMVisitor {
     private VMFrame currFrame;
 
     private HashMap<Identifier, VMAccess> locals;
-    private HashMap<Identifier, VMAccess> fields;
+    private HashMap<String, VMAccess> fields;
     private int currStackSizeNeeded = 0;
     private int currStackSize = 0;
 
@@ -82,6 +82,7 @@ public class JVMVisitor {
         currFrame = null;
 
         labels = new LabelTable();
+        fields = new HashMap<>();
     }
 
     public String visit(Program n) {
@@ -118,7 +119,6 @@ public class JVMVisitor {
                 currMethod.getReturnType());
         currStackSize = 0;
 
-        fields = new HashMap<>();
         locals = new HashMap<>();
 
         String classDecl = ".class public \'" + className + "\'";
@@ -142,7 +142,6 @@ public class JVMVisitor {
         appendOnNewline(pre, ".limit stack " + currStackSizeNeeded,
                 ".limit locals " + nrOfLocals, post.toString());
 
-        fields = null;
         locals = null;
         currFrame = null;
         currRecord = null;
@@ -155,7 +154,6 @@ public class JVMVisitor {
         currClass = currProgram.get(convertToSymbol(n.i));
         String className = currClass.getId().toString();
         currRecord = factory.newRecord(className);
-        fields = new HashMap<>();
 
         StringBuilder sb = appendOnNewline(".class public \'" + className
                 + "\'", ".super java/lang/Object");
@@ -177,7 +175,6 @@ public class JVMVisitor {
 
         setStackSize(1);
 
-        fields = null;
         currRecord = null;
         currClass = null;
 
@@ -188,7 +185,6 @@ public class JVMVisitor {
         currClass = currProgram.get(convertToSymbol(n.i));
         String className = currClass.getId().toString();
         currRecord = factory.newRecord(className);
-        fields = new HashMap<>();
         String superClass = currClass.getSuperClass().toString();
 
         StringBuilder sb = appendOnNewline(".class public \'" + className
@@ -211,7 +207,6 @@ public class JVMVisitor {
 
         setStackSize(1);
 
-        fields = null;
         currRecord = null;
         currClass = null;
 
@@ -594,7 +589,8 @@ public class JVMVisitor {
     }
 
     private void addFieldAccess(Identifier i, VMAccess a) {
-        fields.put(i, a);
+        String key = currClass.getId().toString() + i.s;
+        fields.put(key, a);
     }
 
     private void addLocalAccess(Identifier i, VMAccess a) {
@@ -603,8 +599,14 @@ public class JVMVisitor {
 
     private VMAccess getAccess(Identifier i) {
         VMAccess a = locals.get(i);
+
         if (a == null) {
-            a = fields.get(i);
+            Symbol klass = currClass.getId();
+            while (klass != null) {
+                String key = klass.toString() + i.s;
+                a = fields.get(key);
+                klass = currProgram.get(klass).getSuperClass();
+            }
         }
 
         return a;
