@@ -54,6 +54,9 @@ import frame.VMFrame;
 import frame.VMRecord;
 
 public class JVMVisitor {
+    private static final int FALSE = 0;
+    private static final int TRUE = 1;
+
     private ProgramTable currProgram;
     private ClassTable currClass;
     private MethodTable currMethod;
@@ -64,13 +67,10 @@ public class JVMVisitor {
 
     private HashMap<Identifier, VMAccess> locals;
     private HashMap<Identifier, VMAccess> fields;
-    int currStackSizeNeeded = 0;
-    int currStackSize = 0;
+    private int currStackSizeNeeded = 0;
+    private int currStackSize = 0;
 
     private LabelTable labels;
-
-    private static final int FALSE = 0;
-    private static final int TRUE = 1;
 
     public JVMVisitor(ProgramTable pt, jvm.Factory factory) {
         currProgram = pt;
