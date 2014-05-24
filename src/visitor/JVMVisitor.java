@@ -602,7 +602,7 @@ public class JVMVisitor {
 
         if (a == null) {
             Symbol klass = currClass.getId();
-            while (klass != null) {
+            while (a == null && klass != null) {
                 String key = klass.toString() + i.s;
                 a = fields.get(key);
                 klass = currProgram.get(klass).getSuperClass();
